@@ -6,11 +6,11 @@ import Label from "./Label";
 
 interface ParameterSelectorProps {
   numQuestions: string;
-  setNumQuestions: (number: string | null) => void;
+  setNumQuestions: React.Dispatch<React.SetStateAction<string>>;
   selectedDisease: string;
-  setSelectedDisease: (disease: string | null) => void;
+  setSelectedDisease: React.Dispatch<React.SetStateAction<string>>;
   selectedModel: string;
-  setSelectedModel: (model: string) => void;
+  setSelectedModel: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const ParameterSelector = ({
