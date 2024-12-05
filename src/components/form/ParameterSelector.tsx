@@ -46,7 +46,7 @@ const ParameterSelector = ({
         onChange={(value) => setSelectedModel(value)}
       />
       <small className="block text-sm text-sky-700">
-        GPT-4o is selected by default. You can choose another model from the
+        GPT-4 is selected by default. You can choose another model from the
         dropdown.
       </small>
     </div>
