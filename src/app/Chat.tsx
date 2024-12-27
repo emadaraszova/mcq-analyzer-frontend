@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ChatHeader } from "@/components/chat/ChatHeader";
@@ -9,9 +9,14 @@ const queryClient = new QueryClient();
 const Chat = () => {
   const { sessionId } = useParams();
   const location = useLocation();
-  const { model, prompt, isStreaming } = location.state;
 
-  console.log("isStreaming passed to Chat:", isStreaming); // Log isStreaming value
+  // Memoize location.state values to ensure they are stable
+  const { model, prompt, isStreaming } = useMemo(
+    () => location.state,
+    [location.state]
+  );
+
+  console.log("isStreaming passed to Chat:", isStreaming);
 
   return (
     <QueryClientProvider client={queryClient}>
