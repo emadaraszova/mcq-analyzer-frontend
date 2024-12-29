@@ -1,6 +1,7 @@
 import React, { useState, memo } from "react";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
 import { Loader } from "./Loader";
+import ReactMarkdown from "react-markdown";
 import { useQuery } from "@tanstack/react-query";
 
 interface ChatAnswerProps {
@@ -34,7 +35,7 @@ const fetchNonStreamingResponse = async (
   }
 
   const data = await res.json();
-  return data.response; // Extract the response text
+  return data.response;
 };
 
 export const ChatAnswer = memo(
@@ -45,7 +46,7 @@ export const ChatAnswer = memo(
     isStreaming,
     onResponseReady,
   }: ChatAnswerProps) => {
-    const [response, setResponse] = useState<string>(""); // Accumulated response
+    const [response, setResponse] = useState<string>("");
     const [isStreamingLoading, setIsStreamingLoading] = useState<boolean>(true);
     const [isStreamingError, setIsStreamingError] = useState<boolean>(false);
 
@@ -111,7 +112,7 @@ export const ChatAnswer = memo(
       return () => {
         isCancelled = true;
       };
-    }, [sessionId, prompt, model, isStreaming, onResponseReady]);
+    }, [sessionId, prompt, model, isStreaming]);
 
     React.useEffect(() => {
       if (!isStreaming && data) {
@@ -137,7 +138,17 @@ export const ChatAnswer = memo(
       <div className="border rounded-md p-4 bg-gray-100 overflow-y-auto h-[70%]">
         {finalResponse ? (
           <div className="p-2 mb-2 rounded-lg bg-sky-100 text-sky-900 whitespace-pre-wrap">
-            {finalResponse}
+            <ReactMarkdown
+              children={finalResponse}
+              components={{
+                strong: ({ children }) => (
+                  <strong className="font-bold">{children}</strong>
+                ),
+                em: ({ children }) => (
+                  <em className="italic text-gray-500">{children}</em>
+                ),
+              }}
+            />
           </div>
         ) : (
           <div className="text-gray-500 text-center">
