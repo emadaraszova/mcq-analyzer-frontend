@@ -112,7 +112,7 @@ export const ChatAnswer = memo(
       return () => {
         isCancelled = true;
       };
-    }, [sessionId, prompt, model, isStreaming, onResponseReady]);
+    }, [sessionId, prompt, model, isStreaming]);
 
     React.useEffect(() => {
       if (!isStreaming && data) {
