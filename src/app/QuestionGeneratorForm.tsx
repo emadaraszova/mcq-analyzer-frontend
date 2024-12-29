@@ -19,7 +19,7 @@ const QuestionGeneratorForm = () => {
   const [selectedDisease, setSelectedDisease] = useState<string>("");
   const [selectedModel, setSelectedModel] = useState<string>("gpt-4");
   const [isCustomPrompt, setIsCustomPrompt] = useState<boolean>(false);
-  const [isStreaming, setIsStreaming] = useState<boolean>(true); // Default to streaming enabled
+  const [isStreaming, setIsStreaming] = useState<boolean>(false);
   const [prompt, setPrompt] = useState<string>(
     "Generate x USMLE Step 1 style MCQs on a presentation of y"
   );
