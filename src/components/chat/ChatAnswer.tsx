@@ -8,6 +8,7 @@ interface ChatAnswerProps {
   prompt: string;
   model: string;
   isStreaming: boolean;
+  onResponseReady: () => void;
 }
 
 const fetchNonStreamingResponse = async (
@@ -37,7 +38,13 @@ const fetchNonStreamingResponse = async (
 };
 
 export const ChatAnswer = memo(
-  ({ sessionId, prompt, model, isStreaming }: ChatAnswerProps) => {
+  ({
+    sessionId,
+    prompt,
+    model,
+    isStreaming,
+    onResponseReady,
+  }: ChatAnswerProps) => {
     const [response, setResponse] = useState<string>(""); // Accumulated response
     const [isStreamingLoading, setIsStreamingLoading] = useState<boolean>(true);
     const [isStreamingError, setIsStreamingError] = useState<boolean>(false);
@@ -87,6 +94,7 @@ export const ChatAnswer = memo(
                 onclose() {
                   if (isCancelled) return;
                   console.log("Streaming completed");
+                  onResponseReady();
                 },
               }
             );
@@ -103,7 +111,13 @@ export const ChatAnswer = memo(
       return () => {
         isCancelled = true;
       };
-    }, [sessionId, prompt, model, isStreaming]);
+    }, [sessionId, prompt, model, isStreaming, onResponseReady]);
+
+    React.useEffect(() => {
+      if (!isStreaming && data) {
+        onResponseReady(); // Notify parent for non-streaming mode
+      }
+    }, [isStreaming, data, onResponseReady]);
 
     if (isStreaming ? isStreamingLoading : isLoading) {
       return <Loader />;
@@ -120,7 +134,7 @@ export const ChatAnswer = memo(
     const finalResponse = isStreaming ? response : data;
 
     return (
-      <div className="flex-grow border rounded-md p-4 bg-gray-100 overflow-y-auto">
+      <div className="border rounded-md p-4 bg-gray-100 overflow-y-auto h-[70%]">
         {finalResponse ? (
           <div className="p-2 mb-2 rounded-lg bg-sky-100 text-sky-900 whitespace-pre-wrap">
             {finalResponse}
