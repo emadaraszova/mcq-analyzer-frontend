@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import QuestionGeneratorForm from "./app/QuestionGeneratorForm";
 import Chat from "./app/Chat";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
+import AnalyzedDataPage from "./app/AnalyzedData";
 
 const App = () => {
   return (
@@ -12,6 +13,7 @@ const App = () => {
           <Routes>
             <Route path="/" element={<QuestionGeneratorForm />} />
             <Route path="/chat/:sessionId" element={<Chat />} />
+            <Route path="/analyzed-data" element={<AnalyzedDataPage />} />
           </Routes>
         </div>
       </Router>

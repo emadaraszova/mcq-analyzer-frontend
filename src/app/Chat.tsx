@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ChatHeader } from "@/components/chat/ChatHeader";
 import { ChatAnswer } from "@/components/chat/ChatAnswer";
@@ -13,14 +13,6 @@ import { fetchClinicalAnalysis } from "@/api/analyzeClinical"; // Import the API
 
 const queryClient = new QueryClient();
 
-interface ClinicalAnalysisResult {
-  question_number: number;
-  gender: string;
-  age: string;
-  symptoms: string;
-  family_background: string;
-}
-
 const sanitizeInput = (input: string): string => {
   // Remove invalid control characters and trim the input
   // eslint-disable-next-line no-control-regex
@@ -30,6 +22,7 @@ const sanitizeInput = (input: string): string => {
 const Chat = () => {
   const { sessionId } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const { model, prompt, isStreaming } = useMemo(
     () => location.state,
@@ -39,9 +32,6 @@ const Chat = () => {
   const [isResponseReady, setIsResponseReady] = useState(false);
   const [response, setResponse] = useState<string>(""); // State to capture response
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [analyzedData, setAnalyzedData] = useState<
-    ClinicalAnalysisResult[] | null
-  >(null);
 
   const handleAnalyzeMCQs = async () => {
     try {
@@ -54,8 +44,10 @@ const Chat = () => {
         prompt: sanitizedResponse,
         model,
       });
-      setAnalyzedData(data); // Update the state with the structured data
+
       console.log("Extracted Clinical Data:", data); // Log the extracted data
+      // Navigate to a new page with analyzed data
+      navigate("/analyzed-data", { state: { analyzedData: data } });
     } catch (error) {
       console.error("Error analyzing MCQs:", error);
     } finally {
@@ -102,15 +94,6 @@ const Chat = () => {
             </TooltipContent>
           </Tooltip>
         </div>
-        {/* Display the analyzed data */}
-        {analyzedData && (
-          <div className="mt-4 p-4 border rounded bg-gray-50">
-            <h3 className="font-bold text-lg mb-2">Extracted Information</h3>
-            <pre className="bg-gray-100 p-2 rounded overflow-x-auto">
-              {JSON.stringify(analyzedData, null, 2)}
-            </pre>
-          </div>
-        )}
       </div>
     </QueryClientProvider>
   );
