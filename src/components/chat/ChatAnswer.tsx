@@ -1,8 +1,8 @@
 import React, { useState, memo } from "react";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
 import { Loader } from "./Loader";
-import ReactMarkdown from "react-markdown";
 import { useQuery } from "@tanstack/react-query";
+import ReactMarkdown from "react-markdown";
 
 interface ChatAnswerProps {
   sessionId: string;
@@ -10,6 +10,7 @@ interface ChatAnswerProps {
   model: string;
   isStreaming: boolean;
   onResponseReady: () => void;
+  onResponse: (response: string) => void; // New callback prop to send response to the parent
 }
 
 const fetchNonStreamingResponse = async (
@@ -35,7 +36,7 @@ const fetchNonStreamingResponse = async (
   }
 
   const data = await res.json();
-  return data.response;
+  return data.response; // Extract the response text
 };
 
 export const ChatAnswer = memo(
@@ -45,8 +46,9 @@ export const ChatAnswer = memo(
     model,
     isStreaming,
     onResponseReady,
+    onResponse, // Receive the callback
   }: ChatAnswerProps) => {
-    const [response, setResponse] = useState<string>("");
+    const [response, setResponse] = useState<string>(""); // Accumulated response
     const [isStreamingLoading, setIsStreamingLoading] = useState<boolean>(true);
     const [isStreamingError, setIsStreamingError] = useState<boolean>(false);
 
@@ -58,6 +60,7 @@ export const ChatAnswer = memo(
 
     React.useEffect(() => {
       let isCancelled = false;
+      let accumulatedResponse = "";
 
       if (isStreaming) {
         const fetchStreamingResponse = async () => {
@@ -82,8 +85,11 @@ export const ChatAnswer = memo(
                 onmessage(event) {
                   if (isCancelled) return;
                   if (event.data && event.data !== "[DONE]") {
-                    setResponse((prev) => prev + event.data);
-                    console.log(event.data);
+                    accumulatedResponse += event.data;
+                    setResponse((prev) => {
+                      const updatedResponse = prev + event.data;
+                      return updatedResponse;
+                    });
                     setIsStreamingLoading(false);
                   }
                 },
@@ -95,6 +101,7 @@ export const ChatAnswer = memo(
                 onclose() {
                   if (isCancelled) return;
                   console.log("Streaming completed");
+                  onResponse(accumulatedResponse);
                   onResponseReady();
                 },
               }
@@ -116,9 +123,11 @@ export const ChatAnswer = memo(
 
     React.useEffect(() => {
       if (!isStreaming && data) {
-        onResponseReady(); // Notify parent for non-streaming mode
+        setResponse(data);
+        onResponse(data);
+        onResponseReady();
       }
-    }, [isStreaming, data, onResponseReady]);
+    }, [isStreaming, data, onResponse, onResponseReady]);
 
     if (isStreaming ? isStreamingLoading : isLoading) {
       return <Loader />;
