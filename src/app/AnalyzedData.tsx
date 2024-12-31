@@ -1,13 +1,6 @@
+import { ClinicalAnalysisResult } from "@/types";
 import React from "react";
 import { useLocation } from "react-router-dom";
-
-interface ClinicalAnalysisResult {
-  question_number: number;
-  gender: string;
-  age: string;
-  symptoms: string;
-  family_background: string;
-}
 
 const AnalyzedDataPage = () => {
   const location = useLocation();
