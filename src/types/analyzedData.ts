@@ -5,3 +5,8 @@ export interface ClinicalAnalysisResult {
     symptoms: string;
     family_background: string;
   }
+
+  
+export interface DataAnalysisSummaryProps {
+  analyzedData: ClinicalAnalysisResult[];
+}

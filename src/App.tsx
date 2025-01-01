@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import QuestionGeneratorForm from "./app/QuestionGeneratorForm";
 import Chat from "./app/Chat";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
-import AnalyzedDataPage from "./app/AnalyzedData";
+import AnalyzedDataPage from "./app/ClinicalScenarioAnalysis";
 
 const App = () => {
   return (
