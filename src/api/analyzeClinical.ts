@@ -2,8 +2,9 @@ export const fetchClinicalAnalysis = async (payload: {
   sessionId: string;
   prompt: string;
   model: string;
+  numQuestions: string;
 }) => {
-  const { sessionId, prompt, model } = payload;
+  const { sessionId, prompt, model, numQuestions } = payload;
   const response = await fetch("http://localhost:8000/api/analyze-clinical", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -11,6 +12,7 @@ export const fetchClinicalAnalysis = async (payload: {
       session_id: sessionId,
       message: prompt,
       model,
+      number_of_questions: numQuestions,
     }),
   });
 

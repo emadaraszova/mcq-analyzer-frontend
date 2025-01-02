@@ -23,7 +23,7 @@ const AnalyzedDataPage = () => {
       </h1>
       <p className="text-lg text-slate-600 font-semibold">
         This analysis highlights how often key details are included in the
-        generated clinical scenarios. For example, "Gender: 5/5" indicates that
+        generated clinical scenarios. For example, "gender: 5/5" indicates that
         gender information is mentioned in all 5 scenarios.
       </p>
 
@@ -32,7 +32,7 @@ const AnalyzedDataPage = () => {
 
       <Accordion type="single" collapsible>
         <AccordionItem value="analyzedData">
-          <AccordionTrigger className="font-semibold text-sky-700">
+          <AccordionTrigger className="font-semibold text-lg text-sky-700">
             View the data extracted from the generated questions and used for
             the analysis
           </AccordionTrigger>

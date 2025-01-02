@@ -13,18 +13,12 @@ import { fetchClinicalAnalysis } from "@/api/analyzeClinical"; // Import the API
 
 const queryClient = new QueryClient();
 
-const sanitizeInput = (input: string): string => {
-  // Remove invalid control characters and trim the input
-  // eslint-disable-next-line no-control-regex
-  return input.replace(/[\u0000-\u001F\u007F]/g, "").trim();
-};
-
 const Chat = () => {
   const { sessionId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { model, prompt, isStreaming } = useMemo(
+  const { model, prompt, isStreaming, numQuestions } = useMemo(
     () => location.state,
     [location.state]
   );
@@ -37,12 +31,13 @@ const Chat = () => {
     try {
       const sessionId = crypto.randomUUID();
       setIsAnalyzing(true); // Show loading state
-      const sanitizedResponse = sanitizeInput(response); // Sanitize the response
-      console.log("sanitized_res:", sanitizedResponse);
+      //const sanitizedResponse = sanitizeInput(response); // Sanitize the response
+      //console.log("sanitized_res:", sanitizedResponse);
       const data = await fetchClinicalAnalysis({
         sessionId,
-        prompt: sanitizedResponse,
+        prompt: response,
         model,
+        numQuestions,
       });
 
       console.log("Extracted Clinical Data:", data); // Log the extracted data
