@@ -43,7 +43,11 @@ const Chat = () => {
 
       console.log("Extracted Clinical Data:", data); // Log the extracted data
       navigate("/analyzed-data", {
-        state: { analyzedData: data, originalResponse: response },
+        state: {
+          analyzedData: data,
+          originalResponse: response,
+          model: selectedModel,
+        },
       });
     } catch (error) {
       console.error("Error analyzing MCQs:", error);

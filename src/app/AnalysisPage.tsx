@@ -13,9 +13,10 @@ import ReactMarkdown from "react-markdown";
 
 const AnalyzedDataPage = () => {
   const location = useLocation();
-  const { analyzedData, originalResponse } = location.state as {
+  const { analyzedData, originalResponse, model } = location.state as {
     analyzedData: ClinicalAnalysisResult;
     originalResponse: string;
+    model: string;
   };
 
   return (
@@ -23,6 +24,9 @@ const AnalyzedDataPage = () => {
       <h1 className="text-3xl font-bold text-center">
         Clinical Scenarios Analysis
       </h1>
+      <h2 className="text-center font-semibold text-xl text-sky-700">
+        Analysis done using {model}
+      </h2>
       <p className="text-lg text-slate-600 font-semibold">
         This analysis highlights how often key details are included in the
         generated clinical scenarios. For example, "gender: 5/5" indicates that
