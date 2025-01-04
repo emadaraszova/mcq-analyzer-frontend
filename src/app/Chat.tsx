@@ -92,7 +92,10 @@ const Chat = () => {
                     handleAnalyzeMCQs();
                   }}
                 >
-                  Analyze with gemini-1.5-flash
+                  <span>Analyze with gemini-1.5-flash</span>
+                  <span className="ml-2 text-xs px-2 py-1 rounded bg-green-200 text-green-800">
+                    Free
+                  </span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => {
@@ -100,7 +103,10 @@ const Chat = () => {
                     handleAnalyzeMCQs();
                   }}
                 >
-                  Analyze with gpt-4o
+                  <span>Analyze with gpt-4o</span>
+                  <span className="ml-2 text-xs px-2 py-1 rounded bg-red-200 text-red-800">
+                    Paid
+                  </span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
