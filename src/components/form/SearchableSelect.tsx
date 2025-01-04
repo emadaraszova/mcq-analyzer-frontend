@@ -7,18 +7,7 @@ import {
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
-
-interface Option {
-  value: string;
-  label: string;
-}
-
-interface SearchableSelectProps {
-  placeholder: string;
-  options: Option[];
-  value: string;
-  onChange: (value: string) => void;
-}
+import { SearchableSelectProps } from "@/types/form";
 
 const SearchableSelect = ({
   placeholder,
@@ -55,7 +44,20 @@ const SearchableSelect = ({
         </div>
         {filteredOptions.map((option) => (
           <SelectItem key={option.value} value={option.value}>
-            {option.label}
+            <div className="flex items-center justify-between">
+              <span>{option.label}</span>
+              {option.isFree !== undefined && (
+                <span
+                  className={`ml-2 text-xs px-2 py-1 rounded ${
+                    option.isFree
+                      ? "bg-green-200 text-green-800"
+                      : "bg-red-200 text-red-800"
+                  }`}
+                >
+                  {option.isFree ? "Free" : "Paid"}
+                </span>
+              )}
+            </div>
           </SelectItem>
         ))}
       </SelectContent>

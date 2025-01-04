@@ -55,7 +55,12 @@ const QuestionGeneratorForm = () => {
     console.log("Form submitted:", data);
     const sessionId = crypto.randomUUID();
     navigate(`/chat/${sessionId}`, {
-      state: { model: selectedModel, prompt: data.prompt, isStreaming },
+      state: {
+        model: selectedModel,
+        prompt: data.prompt,
+        isStreaming,
+        numQuestions,
+      },
     });
   };
 
