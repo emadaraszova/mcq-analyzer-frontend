@@ -27,17 +27,15 @@ const Chat = () => {
   const [isResponseReady, setIsResponseReady] = useState(false);
   const [response, setResponse] = useState<string>(""); // State to capture response
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [selectedModel, setSelectedModel] =
-    useState<string>("gemini-1.5-flash"); // Default model
 
-  const handleAnalyzeMCQs = async () => {
+  const handleAnalyzeMCQs = async (selected_model: string) => {
     try {
       const sessionId = crypto.randomUUID();
       setIsAnalyzing(true); // Show loading state
       const data = await fetchClinicalAnalysis({
         sessionId,
         prompt: response,
-        model: selectedModel, // Use selected model
+        model: selected_model, // Use selected model
         numQuestions,
       });
 
@@ -46,7 +44,7 @@ const Chat = () => {
         state: {
           analyzedData: data,
           originalResponse: response,
-          model: selectedModel,
+          model: selected_model,
         },
       });
     } catch (error) {
@@ -88,8 +86,7 @@ const Chat = () => {
               <DropdownMenuContent>
                 <DropdownMenuItem
                   onClick={() => {
-                    setSelectedModel("gemini-1.5-flash");
-                    handleAnalyzeMCQs();
+                    handleAnalyzeMCQs("gemini-1.5-flash");
                   }}
                 >
                   <span>Analyze with gemini-1.5-flash</span>
@@ -99,8 +96,7 @@ const Chat = () => {
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => {
-                    setSelectedModel("gpt-4o");
-                    handleAnalyzeMCQs();
+                    handleAnalyzeMCQs("gpt-4o");
                   }}
                 >
                   <span>Analyze with gpt-4o</span>
