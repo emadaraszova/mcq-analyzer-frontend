@@ -20,13 +20,35 @@ const DataAnalysisSummary: React.FC<DataAnalysisSummaryProps> = ({
     const keys = Object.keys(
       analyzedData.questions[0]
     ) as (keyof ClinicalQuestion)[];
-    const summary: Record<string, string> = {};
+    const summary: Record<
+      string,
+      string | { total: string; breakdown: string }
+    > = {};
 
     keys.forEach((key) => {
-      const nonNullCount = analyzedData.questions.filter(
-        (item) => item[key] !== null && item[key] !== "" && item[key] !== "null"
-      ).length;
-      summary[key] = `${nonNullCount}/${totalQuestions}`;
+      if (key === "gender") {
+        // Count occurrences of each gender
+        const genderCounts = analyzedData.questions.reduce(
+          (counts, item) => {
+            if (item[key] === "male") counts.male += 1;
+            if (item[key] === "female") counts.female += 1;
+            return counts;
+          },
+          { male: 0, female: 0 }
+        );
+        const total = `${
+          genderCounts.male + genderCounts.female
+        }/${totalQuestions}`;
+        const breakdown = `Male: ${genderCounts.male}, Female: ${genderCounts.female}`;
+        summary[key] = { total, breakdown };
+      } else {
+        // Count non-null occurrences for other keys
+        const nonNullCount = analyzedData.questions.filter(
+          (item) =>
+            item[key] !== null && item[key] !== "" && item[key] !== "null"
+        ).length;
+        summary[key] = `${nonNullCount}/${totalQuestions}`;
+      }
     });
 
     return summary;
@@ -45,10 +67,19 @@ const DataAnalysisSummary: React.FC<DataAnalysisSummaryProps> = ({
           {Object.entries(summary).map(([key, value]) => (
             <div
               key={key}
-              className="flex justify-between items-center bg-slate-50 p-4 rounded-lg shadow-sm border border-slate-200"
+              className="flex flex-col bg-slate-50 p-4 rounded-lg shadow-sm border border-slate-200"
             >
-              <span className="text-slate-600 font-bold">{key}:</span>
-              <span className="text-slate-800 font-bold">{value}</span>
+              <div className="flex justify-between items-center">
+                <span className="text-slate-600 font-bold">{key}:</span>
+                <span className="text-slate-800 font-bold">
+                  {typeof value === "string" ? value : value.total}
+                </span>
+              </div>
+              {typeof value === "object" && (
+                <div className="text-sky-700 text-sm font-bold mt-2">
+                  {value.breakdown}
+                </div>
+              )}
             </div>
           ))}
         </div>
