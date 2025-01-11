@@ -3,15 +3,7 @@ import { fetchEventSource } from "@microsoft/fetch-event-source";
 import { Loader } from "./Loader";
 import { useQuery } from "@tanstack/react-query";
 import ReactMarkdown from "react-markdown";
-
-interface ChatAnswerProps {
-  sessionId: string;
-  prompt: string;
-  model: string;
-  isStreaming: boolean;
-  onResponseReady: () => void;
-  onResponse: (response: string) => void; // New callback prop to send response to the parent
-}
+import { ChatAnswerProps } from "@/types/chat";
 
 const fetchNonStreamingResponse = async (
   sessionId: string,

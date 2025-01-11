@@ -3,15 +3,7 @@ import { Input } from "@/components/ui/input";
 import { diseaseOptions, modelOptions } from "@/data/options";
 import SearchableSelect from "./SearchableSelect";
 import Label from "./Label";
-
-interface ParameterSelectorProps {
-  numQuestions: string;
-  setNumQuestions: React.Dispatch<React.SetStateAction<string>>;
-  selectedDisease: string;
-  setSelectedDisease: React.Dispatch<React.SetStateAction<string>>;
-  selectedModel: string;
-  setSelectedModel: React.Dispatch<React.SetStateAction<string>>;
-}
+import { ParameterSelectorProps } from "@/types/form";
 
 const ParameterSelector = ({
   numQuestions,
