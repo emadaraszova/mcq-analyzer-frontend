@@ -5,6 +5,7 @@ import Chat from "./app/Chat";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 import AnalyzedDataPage from "./app/AnalysisPage";
 import Main from "./app/Main";
+import UserQuestionInputPage from "./app/UserQuestioninput";
 
 const App = () => {
   return (
@@ -19,6 +20,10 @@ const App = () => {
             />
             <Route path="/chat/:sessionId" element={<Chat />} />
             <Route path="/analyzed-data" element={<AnalyzedDataPage />} />
+            <Route
+              path="/input-questions"
+              element={<UserQuestionInputPage />}
+            />
           </Routes>
         </div>
       </Router>

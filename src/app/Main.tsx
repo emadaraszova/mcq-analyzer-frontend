@@ -5,13 +5,13 @@ const Main = () => {
     <div className="flex justify-center gap-6 p-6">
       <CardMain
         title="MCQs Generator"
-        description="Generate MCQs using Gemini/GPT models."
+        description="Generate MCQs using one of the Gemini/GPT models."
         redirectTo="/question-generation"
       />
       <CardMain
         title="MCQs Analyzer"
-        description="Analyze data in clinical scenarios within your MCQs."
-        redirectTo={"/"}
+        description="Analyze data in clinical scenarios within your questions."
+        redirectTo={"/input-questions"}
       />
     </div>
   );

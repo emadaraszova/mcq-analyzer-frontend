@@ -19,3 +19,12 @@ export interface SearchableSelectProps {
     value: string;
     onChange: (value: string) => void;
   }
+
+export interface ParameterSelectorProps {
+    numQuestions: string;
+    setNumQuestions: React.Dispatch<React.SetStateAction<string>>;
+    selectedDisease: string;
+    setSelectedDisease: React.Dispatch<React.SetStateAction<string>>;
+    selectedModel: string;
+    setSelectedModel: React.Dispatch<React.SetStateAction<string>>;
+  }
