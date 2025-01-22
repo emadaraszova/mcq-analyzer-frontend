@@ -1,8 +1,7 @@
 export interface ClinicalQuestion {
   age: string;
-  family_background: string;
   gender: string;
-  symptoms: string;
+  ethnicity: string;
 }
 
 export interface ClinicalAnalysisResult {

@@ -1,7 +1,7 @@
 export const diseaseOptions = [
-    { value: "schizophrenia", label: "schizophrenia" },
-    { value: "something1", label: "something 1" },
-    { value: "something2", label: "something 2" },
+    { value: "Osteoporosis", label: "osteoporosis" },
+    { value: "Sickle cell anaemia", label: "sickle cell anaemia" },
+    { value: "Type 1 diabetes", label: "type 1 diabetes" },
   
   ];
   
