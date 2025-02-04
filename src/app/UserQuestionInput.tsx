@@ -1,5 +1,6 @@
 import { fetchClinicalAnalysis } from "@/api/analyzeClinical";
 import AnalyzeDropdownButton from "@/components/chat/AnalyzeDropdownButton";
+import { Loader } from "@/components/clinicalScenarionAnalysis/Loader";
 import Header from "@/components/form/Header";
 import Label from "@/components/form/Label";
 import { Textarea } from "@/components/ui/textarea";
@@ -77,9 +78,10 @@ const UserQuestionInputPage = () => {
         {isAnalyzing && (
           <div className="w-full bg-gray-200 rounded-full h-2.5 mt-4">
             <div
-              className="bg-blue-600 h-2.5 rounded-full"
+              className="bg-sky-700 h-2.5 rounded-full"
               style={{ width: `${progress}%` }}
             ></div>
+            <Loader />
           </div>
         )}
         {!isAnalyzing && (
