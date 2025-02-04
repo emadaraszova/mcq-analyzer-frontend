@@ -1,6 +1,6 @@
 export const fetchClinicalAnalysis = async (payload: {
   sessionId: string;
-  prompt: string;
+  prompt: string | null;
   model: string;
   numQuestions: string;
 }) => {
