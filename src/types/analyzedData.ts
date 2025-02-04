@@ -1,8 +1,6 @@
 export interface ClinicalQuestion {
-  age: string;
-  family_background: string;
   gender: string;
-  symptoms: string;
+  ethnicity: string;
 }
 
 export interface ClinicalAnalysisResult {
@@ -11,4 +9,9 @@ export interface ClinicalAnalysisResult {
 
 export interface DataAnalysisSummaryProps {
   analyzedData: ClinicalAnalysisResult;
+}
+
+export interface PieChartComponentProps {
+  title: string;
+  data: { name: string; value: number }[];
 }

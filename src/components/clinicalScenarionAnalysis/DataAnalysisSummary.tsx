@@ -1,5 +1,6 @@
-import { ClinicalQuestion, DataAnalysisSummaryProps } from "@/types";
 import React from "react";
+import { ClinicalQuestion, DataAnalysisSummaryProps } from "@/types";
+import PieChartComponent from "./PieChart";
 
 const DataAnalysisSummary: React.FC<DataAnalysisSummaryProps> = ({
   analyzedData,
@@ -11,12 +12,11 @@ const DataAnalysisSummary: React.FC<DataAnalysisSummaryProps> = ({
       analyzedData.questions.length === 0
     ) {
       console.warn("No analyzed data provided or questions array is invalid.");
-      return {};
+      return { summary: {}, genderData: [], ethnicityData: [] }; // Always return defaults
     }
 
     const totalQuestions = analyzedData.questions.length;
 
-    // Initialize a summary object for all keys in ClinicalQuestion
     const keys = Object.keys(
       analyzedData.questions[0]
     ) as (keyof ClinicalQuestion)[];
@@ -25,24 +25,78 @@ const DataAnalysisSummary: React.FC<DataAnalysisSummaryProps> = ({
       string | { total: string; breakdown: string }
     > = {};
 
+    const genderData: { name: string; value: number }[] = [];
+    const ethnicityData: { name: string; value: number }[] = [];
+
     keys.forEach((key) => {
       if (key === "gender") {
-        // Count occurrences of each gender
         const genderCounts = analyzedData.questions.reduce(
           (counts, item) => {
-            if (item[key] === "male") counts.male += 1;
-            if (item[key] === "female") counts.female += 1;
+            if (!item[key] || item[key] === null) return counts; // Skip null or missing values
+            const normalizedGender = item[key].trim().toLowerCase(); // Normalize gender
+
+            if (normalizedGender === "male") counts.male += 1;
+            if (normalizedGender === "female") counts.female += 1;
             return counts;
           },
           { male: 0, female: 0 }
+        );
+        genderData.push(
+          { name: "Male", value: genderCounts.male },
+          { name: "Female", value: genderCounts.female }
         );
         const total = `${
           genderCounts.male + genderCounts.female
         }/${totalQuestions}`;
         const breakdown = `Male: ${genderCounts.male}, Female: ${genderCounts.female}`;
         summary[key] = { total, breakdown };
+      } else if (key === "ethnicity") {
+        const ethnicityCounts = analyzedData.questions.reduce(
+          (counts, item) => {
+            if (!item[key] || item[key] === null) return counts; // Skip null values
+            const normalizedEthnicity = item[key]
+              .replace(/-/g, " ") // Replace hyphens with spaces
+              .trim()
+              .toLowerCase(); // Normalize to lowercase
+
+            if (normalizedEthnicity === "african american")
+              counts["African American"] += 1;
+            else if (
+              normalizedEthnicity === "asian" ||
+              normalizedEthnicity === "asian american"
+            )
+              counts["Asian"] += 1; // Group Asian-American with Asian
+            else if (
+              normalizedEthnicity === "caucasian" ||
+              normalizedEthnicity === "white"
+            )
+              counts["Caucasian"] += 1; // Group White with Caucasian
+            else if (normalizedEthnicity === "hispanic")
+              counts["Hispanic"] += 1;
+            else counts["Other"] += 1;
+
+            return counts;
+          },
+          {
+            "African American": 0,
+            Asian: 0,
+            Caucasian: 0,
+            Hispanic: 0,
+            Other: 0,
+          }
+        );
+        Object.entries(ethnicityCounts).forEach(([key, value]) => {
+          ethnicityData.push({ name: key, value });
+        });
+        const total =
+          ethnicityCounts["African American"] +
+          ethnicityCounts["Asian"] +
+          ethnicityCounts["Caucasian"] +
+          ethnicityCounts["Hispanic"] +
+          ethnicityCounts["Other"];
+        const breakdown = `African American: ${ethnicityCounts["African American"]}, Asian: ${ethnicityCounts["Asian"]}, Caucasian: ${ethnicityCounts["Caucasian"]}, Hispanic: ${ethnicityCounts["Hispanic"]}, Other: ${ethnicityCounts["Other"]}`;
+        summary[key] = { total: `${total}/${totalQuestions}`, breakdown };
       } else {
-        // Count non-null occurrences for other keys
         const nonNullCount = analyzedData.questions.filter(
           (item) =>
             item[key] !== null && item[key] !== "" && item[key] !== "null"
@@ -51,10 +105,10 @@ const DataAnalysisSummary: React.FC<DataAnalysisSummaryProps> = ({
       }
     });
 
-    return summary;
+    return { summary, genderData, ethnicityData };
   };
 
-  const summary = calculateSummary();
+  const { summary, genderData, ethnicityData } = calculateSummary();
 
   return (
     <div className="bg-slate-50 p-6 rounded-lg shadow-md">
@@ -63,7 +117,7 @@ const DataAnalysisSummary: React.FC<DataAnalysisSummaryProps> = ({
           No data available for analysis.
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-2">
+        <div className="grid grid-cols-1 gap-4">
           {Object.entries(summary).map(([key, value]) => (
             <div
               key={key}
@@ -82,6 +136,13 @@ const DataAnalysisSummary: React.FC<DataAnalysisSummaryProps> = ({
               )}
             </div>
           ))}
+          <div className="grid grid-cols-2 gap-4">
+            <PieChartComponent title="Gender Distribution" data={genderData} />
+            <PieChartComponent
+              title="Ethnicity Distribution"
+              data={ethnicityData}
+            />
+          </div>
         </div>
       )}
     </div>
