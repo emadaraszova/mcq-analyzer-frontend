@@ -34,8 +34,14 @@ const DataAnalysisSummary: React.FC<DataAnalysisSummaryProps> = ({
           (counts, item) => {
             const gender = item[key]?.trim().toLowerCase();
             if (gender && gender !== "null" && gender !== "unknown") {
-              if (gender === "male" || gender === "boy") counts.male += 1;
-              if (gender === "female" || gender === "girl") counts.female += 1;
+              if (gender === "male" || gender === "boy" || gender === "man")
+                counts.male += 1;
+              if (
+                gender === "female" ||
+                gender === "girl" ||
+                gender === "woman"
+              )
+                counts.female += 1;
             }
             return counts;
           },

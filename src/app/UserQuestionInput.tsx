@@ -20,16 +20,16 @@ const UserQuestionInputPage = () => {
       setProgress(0);
       const sessionId = crypto.randomUUID();
 
-      const extractedScenarios = textareaValue
-        .split("XXX")
-        .map((scenario, index) => (index % 2 == 1 ? scenario.trim() : null))
-        .filter(Boolean);
+      const extractedScenarios =
+        textareaValue
+          .match(/XXX\s*(.*?)\s*XXX/g)
+          ?.map((match) => match.replace(/XXX/g, "").trim()) || [];
 
       const scenarioNum = extractedScenarios.length;
       const allResults = [];
 
       for (let i = 0; i < scenarioNum; i++) {
-        console.log(`Processing scenario ${i + 1}/${allResults}`);
+        console.log(`Processing scenario ${i + 1}/${scenarioNum}`);
 
         const data = await fetchClinicalAnalysis({
           sessionId,
@@ -75,15 +75,17 @@ const UserQuestionInputPage = () => {
           value={textareaValue}
           onChange={handleTextareaChange}
         />
+
         {isAnalyzing && (
           <div className="w-full bg-gray-200 rounded-full h-2.5 mt-4">
             <div
-              className="bg-sky-700 h-2.5 rounded-full"
+              className="bg-sky-700 h-2.5 rounded-full transition-all duration-500"
               style={{ width: `${progress}%` }}
             ></div>
             <Loader />
           </div>
         )}
+
         {!isAnalyzing && (
           <AnalyzeDropdownButton
             isAnalyzing={isAnalyzing}
