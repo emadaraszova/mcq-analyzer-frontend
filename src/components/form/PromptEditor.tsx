@@ -1,20 +1,14 @@
 import React from "react";
-import { Input } from "@/components/ui/input";
 import Label from "./Label";
-
-interface PromptEditorProps {
-  prompt: string;
-  setPrompt: (prompt: string) => void;
-  isCustomPrompt: boolean;
-  setIsCustomPrompt: (custom: boolean) => void;
-}
+import { Textarea } from "../ui/textarea";
+import { PromptEditorProps } from "@/types/form";
 
 const PromptEditor = ({
   prompt,
   setPrompt,
   setIsCustomPrompt,
 }: PromptEditorProps) => {
-  const handlePromptChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePromptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setPrompt(e.target.value);
     setIsCustomPrompt(true);
   };
@@ -22,7 +16,7 @@ const PromptEditor = ({
   return (
     <div className="w-full">
       <Label htmlFor="prompt" text="Prompt" />
-      <Input
+      <Textarea
         id="prompt"
         value={prompt}
         onChange={handlePromptChange}
