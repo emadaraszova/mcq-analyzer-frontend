@@ -6,6 +6,7 @@ import { ChatAnswer } from "@/components/chat/ChatAnswer";
 import { Button } from "@/components/ui/button";
 import { fetchClinicalAnalysis } from "@/api/analyzeClinical";
 import AnalyzeDropdownButton from "@/components/chat/AnalyzeDropdownButton";
+import { Loader } from "@/components/clinicalScenarionAnalysis/Loader";
 
 const queryClient = new QueryClient();
 
@@ -22,22 +23,39 @@ const Chat = () => {
   const [isResponseReady, setIsResponseReady] = useState(false);
   const [response, setResponse] = useState<string>("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   const handleAnalyzeMCQs = async (selected_model: string) => {
     try {
       const sessionId = crypto.randomUUID();
       setIsAnalyzing(true);
-      const data = await fetchClinicalAnalysis({
-        sessionId,
-        prompt: response,
-        model: selected_model,
-        numQuestions,
-      });
+      setProgress(0);
 
-      console.log("Extracted Clinical Data:", data);
+      // ✅ Extracts only the text between "XXX"
+      const extractedScenarios = response
+        .match(/XXX\s*(.*?)\s*XXX/g)
+        ?.map(match => match.replace(/XXX/g, "").trim()) || [];
+
+      const scenarioNum = extractedScenarios.length;
+      const allResults = [];
+
+      for (let i = 0; i < scenarioNum; i++) {
+        console.log(`Processing scenario ${i + 1}/${scenarioNum}`);
+
+        const data = await fetchClinicalAnalysis({
+          sessionId,
+          prompt: extractedScenarios[i],
+          model: selected_model,
+          numQuestions: "1",
+        });
+
+        allResults.push(data);
+        setProgress(((i + 1) / scenarioNum) * 100);
+      }
+
       navigate("/analyzed-data", {
         state: {
-          analyzedData: data,
+          analyzedData: allResults,
           originalResponse: response,
           model: selected_model,
         },
@@ -61,15 +79,30 @@ const Chat = () => {
           onResponseReady={() => setIsResponseReady(true)}
           onResponse={(response) => setResponse(response)}
         />
+
         <div className="fixed bottom-0 left-0 right-0 p-4 bg-white shadow-md flex justify-center gap-4">
           <Button variant="outline" disabled={!isResponseReady}>
             Download the MCQs
           </Button>
-          <AnalyzeDropdownButton
-            isAnalyzing={isAnalyzing}
-            isResponseReady={isResponseReady}
-            onAnalyze={handleAnalyzeMCQs}
-          />
+
+          {/* ✅ Progress UI */}
+          {isAnalyzing && (
+            <div className="w-full bg-gray-200 rounded-full h-2.5 mt-4">
+              <div
+                className="bg-sky-700 h-2.5 rounded-full transition-all duration-500"
+                style={{ width: `${progress}%` }}
+              ></div>
+              <Loader />
+            </div>
+          )}
+
+          {!isAnalyzing && (
+            <AnalyzeDropdownButton
+              isAnalyzing={isAnalyzing}
+              isResponseReady={isResponseReady}
+              onAnalyze={handleAnalyzeMCQs}
+            />
+          )}
         </div>
       </div>
     </QueryClientProvider>

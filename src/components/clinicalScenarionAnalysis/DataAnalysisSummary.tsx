@@ -32,19 +32,27 @@ const DataAnalysisSummary: React.FC<DataAnalysisSummaryProps> = ({
       if (key === "gender") {
         const genderCounts = analyzedData.questions.reduce(
           (counts, item) => {
-            if (!item[key] || item[key] === null) return counts; // Skip null or missing values
-            const normalizedGender = item[key].trim().toLowerCase(); // Normalize gender
-
-            if (normalizedGender === "male") counts.male += 1;
-            if (normalizedGender === "female") counts.female += 1;
+            const gender = item[key]?.trim().toLowerCase();
+            if (gender && gender !== "null" && gender !== "unknown") {
+              if (gender === "male" || gender === "boy" || gender === "man")
+                counts.male += 1;
+              if (
+                gender === "female" ||
+                gender === "girl" ||
+                gender === "woman"
+              )
+                counts.female += 1;
+            }
             return counts;
           },
           { male: 0, female: 0 }
         );
+
         genderData.push(
           { name: "Male", value: genderCounts.male },
           { name: "Female", value: genderCounts.female }
         );
+
         const total = `${
           genderCounts.male + genderCounts.female
         }/${totalQuestions}`;
@@ -53,28 +61,20 @@ const DataAnalysisSummary: React.FC<DataAnalysisSummaryProps> = ({
       } else if (key === "ethnicity") {
         const ethnicityCounts = analyzedData.questions.reduce(
           (counts, item) => {
-            if (!item[key] || item[key] === null) return counts; // Skip null values
-            const normalizedEthnicity = item[key]
-              .replace(/-/g, " ") // Replace hyphens with spaces
+            const ethnicity = item[key]
+              ?.replace(/-/g, " ")
               .trim()
-              .toLowerCase(); // Normalize to lowercase
-
-            if (normalizedEthnicity === "african american")
-              counts["African American"] += 1;
-            else if (
-              normalizedEthnicity === "asian" ||
-              normalizedEthnicity === "asian american"
-            )
-              counts["Asian"] += 1; // Group Asian-American with Asian
-            else if (
-              normalizedEthnicity === "caucasian" ||
-              normalizedEthnicity === "white"
-            )
-              counts["Caucasian"] += 1; // Group White with Caucasian
-            else if (normalizedEthnicity === "hispanic")
-              counts["Hispanic"] += 1;
-            else counts["Other"] += 1;
-
+              .toLowerCase();
+            if (ethnicity && ethnicity !== "null" && ethnicity !== "unknown") {
+              if (ethnicity === "african american")
+                counts["African American"] += 1;
+              else if (ethnicity === "asian" || ethnicity === "asian american")
+                counts["Asian"] += 1;
+              else if (ethnicity === "caucasian" || ethnicity === "white")
+                counts["Caucasian"] += 1;
+              else if (ethnicity === "hispanic") counts["Hispanic"] += 1;
+              else counts["Other"] += 1;
+            }
             return counts;
           },
           {
@@ -85,21 +85,23 @@ const DataAnalysisSummary: React.FC<DataAnalysisSummaryProps> = ({
             Other: 0,
           }
         );
+
         Object.entries(ethnicityCounts).forEach(([key, value]) => {
           ethnicityData.push({ name: key, value });
         });
+
         const total =
           ethnicityCounts["African American"] +
           ethnicityCounts["Asian"] +
           ethnicityCounts["Caucasian"] +
           ethnicityCounts["Hispanic"] +
           ethnicityCounts["Other"];
+
         const breakdown = `African American: ${ethnicityCounts["African American"]}, Asian: ${ethnicityCounts["Asian"]}, Caucasian: ${ethnicityCounts["Caucasian"]}, Hispanic: ${ethnicityCounts["Hispanic"]}, Other: ${ethnicityCounts["Other"]}`;
         summary[key] = { total: `${total}/${totalQuestions}`, breakdown };
       } else {
         const nonNullCount = analyzedData.questions.filter(
-          (item) =>
-            item[key] !== null && item[key] !== "" && item[key] !== "null"
+          (item) => item[key] && item[key] !== "null" && item[key] !== "unknown"
         ).length;
         summary[key] = `${nonNullCount}/${totalQuestions}`;
       }

@@ -19,6 +19,10 @@ const AnalyzedDataPage = () => {
     model: string;
   };
 
+  const flattenedData = Array.isArray(analyzedData)
+    ? analyzedData.flatMap((item) => item.questions || [])
+    : [];
+
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-6">
       <h1 className="text-3xl font-bold text-center">
@@ -33,10 +37,8 @@ const AnalyzedDataPage = () => {
         gender information is mentioned in all 5 scenarios.
       </p>
 
-      {/* Add the summary component */}
-      <DataAnalysisSummary analyzedData={analyzedData} />
+      <DataAnalysisSummary analyzedData={{ questions: flattenedData }} />
 
-      {/* Flex container for side-by-side accordions */}
       <div className="flex flex-col lg:flex-row gap-6">
         {/* First Accordion */}
         <div className="w-full lg:w-1/2">
@@ -52,7 +54,7 @@ const AnalyzedDataPage = () => {
                   style={{ maxHeight: "400px" }}
                 >
                   <CodeBlock
-                    text={JSON.stringify(analyzedData, null, 2)}
+                    text={JSON.stringify({ questions: flattenedData }, null, 2)}
                     language="json"
                     showLineNumbers={true}
                     theme={dracula}

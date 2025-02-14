@@ -28,3 +28,10 @@ export interface ParameterSelectorProps {
     selectedModel: string;
     setSelectedModel: React.Dispatch<React.SetStateAction<string>>;
   }
+
+export interface PromptEditorProps {
+    prompt: string;
+    setPrompt: (prompt: string) => void;
+    isCustomPrompt: boolean;
+    setIsCustomPrompt: (custom: boolean) => void;
+  }
