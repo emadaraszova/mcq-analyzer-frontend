@@ -31,7 +31,6 @@ const Chat = () => {
       setIsAnalyzing(true);
       setProgress(0);
 
-      // ✅ Extracts only the text between "XXX"
       const extractedScenarios = response
         .match(/XXX\s*(.*?)\s*XXX/g)
         ?.map(match => match.replace(/XXX/g, "").trim()) || [];
@@ -40,8 +39,6 @@ const Chat = () => {
       const allResults = [];
 
       for (let i = 0; i < scenarioNum; i++) {
-        console.log(`Processing scenario ${i + 1}/${scenarioNum}`);
-
         const data = await fetchClinicalAnalysis({
           sessionId,
           prompt: extractedScenarios[i],
@@ -80,28 +77,30 @@ const Chat = () => {
           onResponse={(response) => setResponse(response)}
         />
 
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white shadow-md flex justify-center gap-4">
-          <Button variant="outline" disabled={!isResponseReady}>
-            Download the MCQs
-          </Button>
-
-          {/* ✅ Progress UI */}
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white shadow-md flex flex-col items-center gap-2">
           {isAnalyzing && (
-            <div className="w-full bg-gray-200 rounded-full h-2.5 mt-4">
-              <div
-                className="bg-sky-700 h-2.5 rounded-full transition-all duration-500"
-                style={{ width: `${progress}%` }}
-              ></div>
+            <>
               <Loader />
-            </div>
+              <div className="w-full bg-gray-300 rounded-full h-4 mt-2">
+                <div
+                  className="bg-sky-700 h-4 rounded-full transition-all duration-500"
+                  style={{ width: `${progress}%` }}
+                ></div>
+              </div>
+            </>
           )}
 
           {!isAnalyzing && (
-            <AnalyzeDropdownButton
-              isAnalyzing={isAnalyzing}
-              isResponseReady={isResponseReady}
-              onAnalyze={handleAnalyzeMCQs}
-            />
+            <div className="flex gap-4">
+              <Button variant="outline" disabled={!isResponseReady}>
+                Download the MCQs
+              </Button>
+              <AnalyzeDropdownButton
+                isAnalyzing={isAnalyzing}
+                isResponseReady={isResponseReady}
+                onAnalyze={handleAnalyzeMCQs}
+              />
+            </div>
           )}
         </div>
       </div>
