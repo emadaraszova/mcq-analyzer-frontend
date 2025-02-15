@@ -20,8 +20,7 @@ const QuestionGeneratorForm = () => {
   const [selectedModel, setSelectedModel] = useState<string>("gpt-4");
   const [isCustomPrompt, setIsCustomPrompt] = useState<boolean>(false);
   const [isStreaming, setIsStreaming] = useState<boolean>(false);
-  const [prompt, setPrompt] = useState<string>(`
-    You are developing a question bank for medical exams focusing on the topic of x. 
+  const [prompt, setPrompt] = useState<string>(`You are developing a question bank for medical exams focusing on the topic of x. 
     Please generate y high-quality, single-best-answer multiple-choice questions. 
     Follow the principles of constructing multiple-choice items in medical education. 
     Generate the questions using the following framework:
@@ -55,7 +54,7 @@ const QuestionGeneratorForm = () => {
     
     Always mention **ethnicity** in the clinical scenario. Structure the question so that the clinical 
     scenario is separated with **'XXX'**, following this format:  
-    "...XXX <clinical scenario - the case> XXX..."
+    "...XXX <clinical scenario - the case> XXX <question>..."
     `);
     
 
@@ -109,7 +108,7 @@ const QuestionGeneratorForm = () => {
   
   Always mention **ethnicity** in the clinical scenario. Structure the question so that the clinical 
   scenario is separated with **'XXX'**, following this format:  
-  "...XXX <clinical scenario - the case> XXX..."
+  "...XXX <clinical scenario - the case> XXX <question>..."
       `;
   
       setPrompt(generatedPrompt);
@@ -145,7 +144,7 @@ const QuestionGeneratorForm = () => {
 
   return (
     <div className="flex flex-col items-center px-4 py-8 max-w-screen-lg mx-auto">
-      <Header title="Generator for USMLE Step 1 Style MCQs" />
+      <Header title="Generator for case-based MCQs" />
       <form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-6">
         <ParameterSelector
           numQuestions={numQuestions}

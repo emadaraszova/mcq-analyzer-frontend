@@ -20,7 +20,7 @@ const PromptEditor = ({
         id="prompt"
         value={prompt}
         onChange={handlePromptChange}
-        placeholder="Generate a USMLE Step 1 style MCQ..."
+        placeholder="Generate a case-based MCQ..."
         className="h-24 w-full resize-none p-4 text-sm sm:text-lg border rounded-lg"
       />
       <small className="block text-sm text-sky-700 mt-1">
