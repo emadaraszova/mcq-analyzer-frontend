@@ -54,7 +54,7 @@ const QuestionGeneratorForm = () => {
     
     Always mention **ethnicity** in the clinical scenario. Structure the question so that the clinical 
     scenario is separated with **'XXX'**, following this format:  
-    "...XXX <clinical scenario - the case> XXX <question>..."
+    "...XXX <clinical scenario - the case> XXX...", so it can be extracted for analysis.
     `);
     
 
@@ -108,7 +108,7 @@ const QuestionGeneratorForm = () => {
   
   Always mention **ethnicity** in the clinical scenario. Structure the question so that the clinical 
   scenario is separated with **'XXX'**, following this format:  
-  "...XXX <clinical scenario - the case> XXX <question>..."
+  "...XXX <clinical scenario - the case> XXX...", so it can be extracted for analysis.
       `;
   
       setPrompt(generatedPrompt);
