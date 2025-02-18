@@ -12,18 +12,13 @@ const DataAnalysisSummary: React.FC<DataAnalysisSummaryProps> = ({
       analyzedData.questions.length === 0
     ) {
       console.warn("No analyzed data provided or questions array is invalid.");
-      return { summary: {}, genderData: [], ethnicityData: [] }; // Always return defaults
+      return { summary: {}, genderData: [], ethnicityData: [] };
     }
 
     const totalQuestions = analyzedData.questions.length;
 
-    const keys = Object.keys(
-      analyzedData.questions[0]
-    ) as (keyof ClinicalQuestion)[];
-    const summary: Record<
-      string,
-      string | { total: string; breakdown: string }
-    > = {};
+    const keys = Object.keys(analyzedData.questions[0]) as (keyof ClinicalQuestion)[];
+    const summary: Record<string, string | { total: string; breakdown: string }> = {};
 
     const genderData: { name: string; value: number }[] = [];
     const ethnicityData: { name: string; value: number }[] = [];
@@ -61,18 +56,13 @@ const DataAnalysisSummary: React.FC<DataAnalysisSummaryProps> = ({
       } else if (key === "ethnicity") {
         const ethnicityCounts = analyzedData.questions.reduce(
           (counts, item) => {
-            const ethnicity = item[key]
-              ?.replace(/-/g, " ")
-              .trim()
-              .toLowerCase();
+            const ethnicity = item[key]?.replace(/-/g, " ").trim().toLowerCase();
             if (ethnicity && ethnicity !== "null" && ethnicity !== "unknown") {
-              if (ethnicity === "african american")
-                counts["African American"] += 1;
-              else if (ethnicity === "asian" || ethnicity === "asian american")
-                counts["Asian"] += 1;
-              else if (ethnicity === "caucasian" || ethnicity === "white")
-                counts["Caucasian"] += 1;
+              if (ethnicity === "african american") counts["African American"] += 1;
+              else if (ethnicity === "asian" || ethnicity === "asian american") counts["Asian"] += 1;
+              else if (ethnicity === "caucasian" || ethnicity === "white") counts["Caucasian"] += 1;
               else if (ethnicity === "hispanic") counts["Hispanic"] += 1;
+              else if (ethnicity === "middle eastern") counts["Middle Eastern"] += 1;
               else counts["Other"] += 1;
             }
             return counts;
@@ -82,6 +72,7 @@ const DataAnalysisSummary: React.FC<DataAnalysisSummaryProps> = ({
             Asian: 0,
             Caucasian: 0,
             Hispanic: 0,
+            "Middle Eastern": 0,
             Other: 0,
           }
         );
@@ -95,9 +86,10 @@ const DataAnalysisSummary: React.FC<DataAnalysisSummaryProps> = ({
           ethnicityCounts["Asian"] +
           ethnicityCounts["Caucasian"] +
           ethnicityCounts["Hispanic"] +
+          ethnicityCounts["Middle Eastern"] +
           ethnicityCounts["Other"];
 
-        const breakdown = `African American: ${ethnicityCounts["African American"]}, Asian: ${ethnicityCounts["Asian"]}, Caucasian: ${ethnicityCounts["Caucasian"]}, Hispanic: ${ethnicityCounts["Hispanic"]}, Other: ${ethnicityCounts["Other"]}`;
+        const breakdown = `African American: ${ethnicityCounts["African American"]}, Asian: ${ethnicityCounts["Asian"]}, Caucasian: ${ethnicityCounts["Caucasian"]}, Hispanic: ${ethnicityCounts["Hispanic"]}, Middle Eastern: ${ethnicityCounts["Middle Eastern"]}, Other: ${ethnicityCounts["Other"]}`;
         summary[key] = { total: `${total}/${totalQuestions}`, breakdown };
       } else {
         const nonNullCount = analyzedData.questions.filter(
