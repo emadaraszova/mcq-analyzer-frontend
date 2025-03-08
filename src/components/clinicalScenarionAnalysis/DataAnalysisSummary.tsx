@@ -21,7 +21,7 @@ const DataAnalysisSummary: React.FC<DataAnalysisSummaryProps> = ({
     const summary: Record<string, string | { total: string; breakdown: string }> = {};
 
     const genderData: { name: string; value: number }[] = [];
-    const ethnicityData: { name: string; value: number }[] = [];
+    const ethnicityCounts: Record<string, number> = {};
 
     keys.forEach((key) => {
       if (key === "gender") {
@@ -29,14 +29,8 @@ const DataAnalysisSummary: React.FC<DataAnalysisSummaryProps> = ({
           (counts, item) => {
             const gender = item[key]?.trim().toLowerCase();
             if (gender && gender !== "null" && gender !== "unknown") {
-              if (gender === "male" || gender === "boy" || gender === "man")
-                counts.male += 1;
-              if (
-                gender === "female" ||
-                gender === "girl" ||
-                gender === "woman"
-              )
-                counts.female += 1;
+              if (["male", "boy", "man"].includes(gender)) counts.male += 1;
+              if (["female", "girl", "woman"].includes(gender)) counts.female += 1;
             }
             return counts;
           },
@@ -48,56 +42,28 @@ const DataAnalysisSummary: React.FC<DataAnalysisSummaryProps> = ({
           { name: "Female", value: genderCounts.female }
         );
 
-        const total = `${
-          genderCounts.male + genderCounts.female
-        }/${totalQuestions}`;
-        const breakdown = `Male: ${genderCounts.male}, Female: ${genderCounts.female}`;
-        summary[key] = { total, breakdown };
+        summary[key] = { total: `${genderCounts.male + genderCounts.female}/${totalQuestions}`, breakdown: `Male: ${genderCounts.male}, Female: ${genderCounts.female}` };
       } else if (key === "ethnicity") {
-        const ethnicityCounts = analyzedData.questions.reduce(
-          (counts, item) => {
-            const ethnicity = item[key]?.replace(/-/g, " ").trim().toLowerCase();
-            if (ethnicity && ethnicity !== "null" && ethnicity !== "unknown") {
-              if (ethnicity === "african american") counts["African American"] += 1;
-              else if (ethnicity === "asian" || ethnicity === "asian american") counts["Asian"] += 1;
-              else if (ethnicity === "caucasian" || ethnicity === "white") counts["Caucasian"] += 1;
-              else if (ethnicity === "hispanic") counts["Hispanic"] += 1;
-              else if (ethnicity === "middle eastern") counts["Middle Eastern"] += 1;
-              else counts["Other"] += 1;
-            }
-            return counts;
-          },
-          {
-            "African American": 0,
-            Asian: 0,
-            Caucasian: 0,
-            Hispanic: 0,
-            "Middle Eastern": 0,
-            Other: 0,
+        analyzedData.questions.forEach((item) => {
+          const ethnicity = item[key]?.replace(/-/g, " ").trim();
+          if (ethnicity && ethnicity !== "null" && ethnicity !== "unknown") {
+            ethnicityCounts[ethnicity] = (ethnicityCounts[ethnicity] || 0) + 1;
           }
-        );
-
-        Object.entries(ethnicityCounts).forEach(([key, value]) => {
-          ethnicityData.push({ name: key, value });
         });
 
-        const total =
-          ethnicityCounts["African American"] +
-          ethnicityCounts["Asian"] +
-          ethnicityCounts["Caucasian"] +
-          ethnicityCounts["Hispanic"] +
-          ethnicityCounts["Middle Eastern"] +
-          ethnicityCounts["Other"];
+        const total = Object.values(ethnicityCounts).reduce((a, b) => a + b, 0);
+        const breakdown = Object.entries(ethnicityCounts)
+          .map(([eth, count]) => `${eth}: ${count}`)
+          .join(", ");
 
-        const breakdown = `African American: ${ethnicityCounts["African American"]}, Asian: ${ethnicityCounts["Asian"]}, Caucasian: ${ethnicityCounts["Caucasian"]}, Hispanic: ${ethnicityCounts["Hispanic"]}, Middle Eastern: ${ethnicityCounts["Middle Eastern"]}, Other: ${ethnicityCounts["Other"]}`;
         summary[key] = { total: `${total}/${totalQuestions}`, breakdown };
       } else {
-        const nonNullCount = analyzedData.questions.filter(
-          (item) => item[key] && item[key] !== "null" && item[key] !== "unknown"
-        ).length;
+        const nonNullCount = analyzedData.questions.filter((item) => item[key] && item[key] !== "null" && item[key] !== "unknown").length;
         summary[key] = `${nonNullCount}/${totalQuestions}`;
       }
     });
+
+    const ethnicityData = Object.entries(ethnicityCounts).map(([name, value]) => ({ name, value }));
 
     return { summary, genderData, ethnicityData };
   };
@@ -107,35 +73,23 @@ const DataAnalysisSummary: React.FC<DataAnalysisSummaryProps> = ({
   return (
     <div className="bg-slate-50 p-6 rounded-lg shadow-md">
       {Object.keys(summary).length === 0 ? (
-        <div className="text-center text-slate-500">
-          No data available for analysis.
-        </div>
+        <div className="text-center text-slate-500">No data available for analysis.</div>
       ) : (
         <div className="grid grid-cols-1 gap-4">
           {Object.entries(summary).map(([key, value]) => (
-            <div
-              key={key}
-              className="flex flex-col bg-slate-50 p-4 rounded-lg shadow-sm border border-slate-200"
-            >
+            <div key={key} className="flex flex-col bg-slate-50 p-4 rounded-lg shadow-sm border border-slate-200">
               <div className="flex justify-between items-center">
                 <span className="text-slate-600 font-bold">{key}:</span>
-                <span className="text-slate-800 font-bold">
-                  {typeof value === "string" ? value : value.total}
-                </span>
+                <span className="text-slate-800 font-bold">{typeof value === "string" ? value : value.total}</span>
               </div>
               {typeof value === "object" && (
-                <div className="text-sky-700 text-sm font-bold mt-2">
-                  {value.breakdown}
-                </div>
+                <div className="text-sky-700 text-sm font-bold mt-2">{value.breakdown}</div>
               )}
             </div>
           ))}
           <div className="grid grid-cols-2 gap-4">
             <PieChartComponent title="Gender Distribution" data={genderData} />
-            <PieChartComponent
-              title="Ethnicity Distribution"
-              data={ethnicityData}
-            />
+            <PieChartComponent title="Ethnicity Distribution" data={ethnicityData} />
           </div>
         </div>
       )}
