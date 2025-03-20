@@ -7,6 +7,9 @@ import { Textarea } from "@/components/ui/textarea";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+const MAX_REQUESTS_PER_MINUTE = 15;
+const INTERVAL_BETWEEN_REQUESTS = 60000 / MAX_REQUESTS_PER_MINUTE; // 4000ms (4 seconds)
+
 const UserQuestionInputPage = () => {
   const navigate = useNavigate();
   const [textareaValue, setTextareaValue] = useState("");
@@ -30,6 +33,10 @@ const UserQuestionInputPage = () => {
 
       for (let i = 0; i < scenarioNum; i++) {
         console.log(`Processing scenario ${i + 1}/${scenarioNum}`);
+
+        if (selected_model.startsWith("gemini")) {
+          await new Promise((resolve) => setTimeout(resolve, INTERVAL_BETWEEN_REQUESTS));
+        }
 
         const data = await fetchClinicalAnalysis({
           sessionId,
