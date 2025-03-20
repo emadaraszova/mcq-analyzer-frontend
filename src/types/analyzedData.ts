@@ -15,7 +15,3 @@ export interface PieChartComponentProps {
   title: string;
   data: { name: string; value: number }[];
 }
-
-export interface AgeHistogramProps {
-  ageData: number[];
-}
