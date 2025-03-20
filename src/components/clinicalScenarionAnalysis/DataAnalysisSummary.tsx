@@ -1,6 +1,7 @@
 import React from "react";
 import { ClinicalQuestion, DataAnalysisSummaryProps } from "@/types";
 import PieChartComponent from "./PieChart";
+import AgeHistogram from "./Histogram";
 
 const DataAnalysisSummary: React.FC<DataAnalysisSummaryProps> = ({
   analyzedData,
@@ -22,6 +23,7 @@ const DataAnalysisSummary: React.FC<DataAnalysisSummaryProps> = ({
 
     const genderData: { name: string; value: number }[] = [];
     const ethnicityCounts: Record<string, number> = {};
+    const ageValues: number[] = [];
 
     keys.forEach((key) => {
       if (key === "gender") {
@@ -45,8 +47,21 @@ const DataAnalysisSummary: React.FC<DataAnalysisSummaryProps> = ({
         summary[key] = { total: `${genderCounts.male + genderCounts.female}/${totalQuestions}`, breakdown: `Male: ${genderCounts.male}, Female: ${genderCounts.female}` };
       } else if (key === "ethnicity") {
         analyzedData.questions.forEach((item) => {
-          const ethnicity = item[key]?.replace(/-/g, " ").trim();
+          let ethnicity = item[key]?.replace(/-/g, " ").trim().toLowerCase();
           if (ethnicity && ethnicity !== "null" && ethnicity !== "unknown") {
+          
+            if (ethnicity.includes("hispanic") || ethnicity.includes("latino")) {
+              ethnicity = "Hispanic";
+            } else if (ethnicity.includes("asian")) {
+              ethnicity = "Asian";
+            } else if (ethnicity.includes("white")) {
+              ethnicity = "White";
+            } else if (ethnicity.includes("black")) {
+              ethnicity = "Black";
+            } 
+      
+            ethnicity = ethnicity.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+
             ethnicityCounts[ethnicity] = (ethnicityCounts[ethnicity] || 0) + 1;
           }
         });
@@ -57,19 +72,34 @@ const DataAnalysisSummary: React.FC<DataAnalysisSummaryProps> = ({
           .join(", ");
 
         summary[key] = { total: `${total}/${totalQuestions}`, breakdown };
+    
+      } else if (key === "age") {
+        analyzedData.questions.forEach((item) => {
+          const age = item[key];
+          if (age && age !== "null" && age !== "unknown") {
+            ageValues.push(parseInt(age));
+          }
+        });
+
+        if (ageValues.length > 0) {
+          const meanAge = ageValues.reduce((a, b) => a + b, 0) / ageValues.length;
+          const medianAge = ageValues.sort((a, b) => a - b)[Math.floor(ageValues.length / 2)];
+          summary[key] = { total: `${ageValues.length}/${totalQuestions}`, breakdown: `Mean: ${meanAge.toFixed(2)}, Median: ${medianAge}` };
+        } else {
+          summary[key] = "No valid data";
+        }
       } else {
         const nonNullCount = analyzedData.questions.filter((item) => item[key] && item[key] !== "null" && item[key] !== "unknown").length;
         summary[key] = `${nonNullCount}/${totalQuestions}`;
       }
     });
-
+        
     const ethnicityData = Object.entries(ethnicityCounts).map(([name, value]) => ({ name, value }));
 
-    return { summary, genderData, ethnicityData };
+    return { summary, genderData, ethnicityData,ageData: ageValues };
   };
 
-  const { summary, genderData, ethnicityData } = calculateSummary();
-
+  const { summary, genderData, ethnicityData, ageData = [] } = calculateSummary();
   return (
     <div className="bg-slate-50 p-6 rounded-lg shadow-md">
       {Object.keys(summary).length === 0 ? (
@@ -91,6 +121,7 @@ const DataAnalysisSummary: React.FC<DataAnalysisSummaryProps> = ({
             <PieChartComponent title="Gender Distribution" data={genderData} />
             <PieChartComponent title="Ethnicity Distribution" data={ethnicityData} />
           </div>
+          <AgeHistogram ageData={ageData} />
         </div>
       )}
     </div>
