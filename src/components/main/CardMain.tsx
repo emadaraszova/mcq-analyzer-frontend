@@ -20,7 +20,7 @@ const CardMain = ({ title, description, redirectTo }: CardProps) => {
   };
 
   return (
-    <Card className="w-[85%] hover:border-sky-700">
+    <Card className="w-[80%] hover:border-sky-700">
       <CardHeader></CardHeader>
       <CardContent>
         <CardTitle>{title}</CardTitle>
