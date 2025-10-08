@@ -10,8 +10,8 @@ const Main = () => {
 
       {/* About Section */}
       <section
-        className="bg-blue-50 p-6 rounded-lg border w-full max-w-4xl overflow-y-auto hover:bg-white"
-        style={{ maxHeight: "250px" }}
+        className="bg-blue-50 p-6 rounded-lg border w-full max-w-4xl overflow-y-auto hover:bg-white  max-h-[35vh]"
+
       >
         <h2 className="text-2xl font-semibold mb-2">About this Tool</h2>
         <p className="text-slate-700 leading-relaxed">

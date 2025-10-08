@@ -22,7 +22,7 @@ const AnalyzeDropdownButton: React.FC<AnalyzeDropdownButtonProps> = ({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" disabled={!isResponseReady || isAnalyzing}>
-          {isAnalyzing ? "Analyzing..." : "Analyze the MCQs"}
+          {isAnalyzing ? "Analyzing..." : "Analyze the text"}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>

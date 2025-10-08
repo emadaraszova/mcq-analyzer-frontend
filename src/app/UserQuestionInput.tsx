@@ -72,13 +72,13 @@ const UserQuestionInputPage = () => {
   };
 
   return (
-    <div className="flex flex-col">
-      <Header title={"Analyze Your Questions"} />
+    <div className="flex flex-col max-w-3xl mx-auto w-full">
+      <Header title={"Analyze Your Text"} />
       <div className="flex flex-col justify-center">
-        <Label htmlFor="textareaValue" text="Questions" />
+        <Label htmlFor="textareaValue" text="Your text" />
         <Textarea
           className="mb-4"
-          placeholder="Paste your questions here."
+          placeholder="Paste your text here."
           value={textareaValue}
           onChange={handleTextareaChange}
         />
