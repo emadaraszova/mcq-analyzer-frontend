@@ -140,7 +140,7 @@ const QuestionGeneratorForm = () => {
 
   return (
     <div className="flex flex-col items-center px-4 py-8 max-w-screen-lg mx-auto">
-      <Header title="Generator for case-based MCQs" />
+      <Header title="Generate Your Educational Materials" />
       <form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-6">
         <ParameterSelector
           numQuestions={numQuestions}
