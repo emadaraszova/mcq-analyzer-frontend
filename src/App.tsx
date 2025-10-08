@@ -5,26 +5,30 @@ import Chat from "./app/Chat";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 import AnalyzedDataPage from "./app/AnalysisPage";
 import Main from "./app/Main";
-import UserQuestionInputPage from "./app/UserQuestioninput";
+import UserQuestionInputPage from "./app/UserQuestionInput";
+import Navbar from "./components/main/navbar";
 
 const App = () => {
   return (
     <TooltipProvider>
       <Router>
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <Routes>
-            <Route path="/" element={<Main />} />
-            <Route
-              path="/question-generation"
-              element={<QuestionGeneratorForm />}
-            />
-            <Route path="/chat/:sessionId" element={<Chat />} />
-            <Route path="/analyzed-data" element={<AnalyzedDataPage />} />
-            <Route
-              path="/input-questions"
-              element={<UserQuestionInputPage />}
-            />
-          </Routes>
+        <div className="min-h-screen bg-blue-50">
+          <Navbar />
+          <main className="max-w-screen-xl mx-auto px-4 py-6">
+            <Routes>
+              <Route path="/" element={<Main />} />
+              <Route
+                path="/generator"
+                element={<QuestionGeneratorForm />}
+              />
+              <Route path="/chat/:sessionId" element={<Chat />} />
+              <Route path="/analyzed-data" element={<AnalyzedDataPage />} />
+              <Route
+                path="/analyzer"
+                element={<UserQuestionInputPage />}
+              />
+            </Routes>
+          </main>
         </div>
       </Router>
     </TooltipProvider>
