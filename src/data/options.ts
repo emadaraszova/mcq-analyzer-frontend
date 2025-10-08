@@ -6,6 +6,7 @@ export const diseaseOptions = [
   ];
   
   export const modelOptions = [
+    { value: "gpt-5", label: "gpt-5", isFree: false },
     { value: "gpt-4o", label: "gpt-4o", isFree: false },
     { value: "chatgpt-4o-latest", label: "chatgpt-4o-latest", isFree: false },
     { value: "gpt-4", label: "gpt-4", isFree: false },
