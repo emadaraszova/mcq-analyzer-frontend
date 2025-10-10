@@ -28,7 +28,7 @@ const AnalyzeDropdownButton: React.FC<AnalyzeDropdownButtonProps> = ({
       <DropdownMenuContent>
         <DropdownMenuItem
           onClick={() => {
-            onAnalyze("gemini-1.5-flash");
+            onAnalyze("gemini-2.5-flash");
           }}
         >
           <span>Analyze with gemini-1.5-flash</span>
