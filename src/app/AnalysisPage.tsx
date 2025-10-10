@@ -31,9 +31,9 @@ const AnalyzedDataPage = () => {
       <h2 className="text-center font-semibold text-xl text-sky-700">
         Analysis done using {model}
       </h2>
-      <p className="text-lg text-slate-600 font-semibold">
+      <p className="text-lg text-slate-600 font-semibold text-center">
         This analysis highlights how often key details are included in the
-        generated clinical scenarios. For example, "gender: 5/5" indicates that
+        generated scenarios. For example, "gender: 5/5" indicates that
         gender information is mentioned in all 5 scenarios.
       </p>
 
