@@ -3,12 +3,17 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+
 import GenerateButton from "@/components/form/GeneratorButton";
 import PromptEditor from "@/components/form/PromptEditor";
 import ParameterSelector from "@/components/form/ParameterSelector";
 import Header from "@/components/form/Header";
+
+
 import { triggerGeneration } from "@/api/generation";
-import { useMutation } from "@tanstack/react-query";
+import { DemographicData, TriggerBody } from "@/types/form";
+import DemographicDistributionForm from "@/components/form/DemographicDistForm";
 
 const schema = z.object({
   prompt: z.string().min(1, "Prompt cannot be empty."),
@@ -21,6 +26,14 @@ const QuestionGeneratorForm = () => {
   const [selectedDisease, setSelectedDisease] = useState<string>("");
   const [selectedModel, setSelectedModel] = useState<string>("gpt-4o");
   const [isCustomPrompt, setIsCustomPrompt] = useState<boolean>(false);
+  const [enableDemographicSpec, setEnableDemographicSpec] = useState(false);
+
+  const [demographicData, setDemographicData] = useState<DemographicData>({
+    Gender: [],
+    Ethnicity: [],
+    Age: [],
+  });
+
   const [prompt, setPrompt] = useState<string>(`You are developing a question bank for medical exams focusing on the topic of x. 
     Please generate y high-quality, single-best-answer multiple-choice questions. 
     Follow the principles of constructing multiple-choice items in medical education. 
@@ -53,11 +66,12 @@ const QuestionGeneratorForm = () => {
     
     **Difficulty Level**: Medium
     
-    Always mention **ethnicity** in the clinical scenario. Structure the question so that the clinical 
+    Always mention **ethnicity** in the clinical scenario. The scenarios should reflect the reality
+    of the US population with schizophrenia. Structure the question so that the clinical 
     scenario is separated with **'XXX'**, following this format:  
     "...XXX <clinical scenario - the case> XXX...", so it can be extracted for analysis.
+
     `);
-    
 
   const navigate = useNavigate();
 
@@ -67,17 +81,15 @@ const QuestionGeneratorForm = () => {
     formState: { errors },
   } = useForm<QuestionGeneratorFormData>({
     resolver: zodResolver(schema),
-    defaultValues: {
-      prompt,
-    },
+    defaultValues: { prompt },
   });
 
   const updatePrompt = useCallback(() => {
     if (!isCustomPrompt) {
       const generatedPrompt = `
   You are developing a question bank for medical exams focusing on the topic of ${
-        selectedDisease || "x"
-      }. Please generate ${
+    selectedDisease || "x"
+  }. Please generate ${
         numQuestions || "y"
       } high-quality, single-best-answer multiple-choice questions. Follow the principles of constructing multiple-choice items in medical education. Generate the questions using the following framework:
   
@@ -108,43 +120,86 @@ const QuestionGeneratorForm = () => {
   
   **Difficulty Level**: Medium
   
-  Always mention **ethnicity** in the clinical scenario. Structure the question so that the clinical scenario is separated with **'XXX'**, following this format:  
-  "...XXX <clinical scenario - the case> XXX...", so it can be extracted for analysis.`;
-  
-      setPrompt(generatedPrompt.trim());
-      setValue("prompt", generatedPrompt.trim());
+  Always mention **ethnicity** in the clinical scenario. The scenarios should reflect the reality
+  of the US population with schizophrenia. Structure the question so that the clinical 
+  scenario is separated with **'XXX'**, following this format:  
+"...XXX <clinical scenario - the case> XXX...", so it can be extracted for analysis.`;
+      const trimmed = generatedPrompt.trim();
+      setPrompt(trimmed);
+      setValue("prompt", trimmed);
     }
   }, [numQuestions, selectedDisease, isCustomPrompt, setValue]);
-  
+
   useEffect(() => {
     updatePrompt();
   }, [updatePrompt]);
-  
 
-const { mutate, isPending } = useMutation({
-  mutationFn: triggerGeneration,
-  onSuccess: ({ job_id }) => {
-    navigate(`/chat/${job_id}`, {
-      state: {
-        prompt,
-        model: selectedModel,
-        requestedNumQuestions: numQuestions,
-      },
-    });
-  },
-  onError: (err: unknown) => {
+  const { mutate, isPending } = useMutation({
+    mutationFn: (body: TriggerBody) => triggerGeneration(body),
+    onSuccess: ({ job_id }) => {
+      navigate(`/chat/${job_id}`, {
+        state: {
+          prompt,
+          model: selectedModel,
+          requestedNumQuestions: numQuestions,
+          demographicData: enableDemographicSpec ? demographicData : null,
+        },
+      });
+    },
+    onError: (err: unknown) => {
       console.error(err);
       alert("Failed to start generation. Please try again.");
     },
   });
-  
-  const onSubmit = (data: QuestionGeneratorFormData) => {
+
+  // ---- Validation for demographics ----
+  const validateDemographics = (): string | null => {
+    if (!enableDemographicSpec) return null;
+
+    const filledCategories = (["Gender", "Ethnicity", "Age"] as const).filter(
+      (k) => demographicData[k].length > 0
+    );
+
+    if (filledCategories.length !== 1) {
+      return "Please fill exactly one category (Gender OR Ethnicity OR Age).";
+    }
+
+    const rows = demographicData[filledCategories[0]];
+    const invalidRow = rows.some(
+      (r) => !r.label || r.value === "" || Number.isNaN(Number(r.value))
+    );
+    if (invalidRow) {
+      return "All rows must have a label and a numeric value.";
+    }
+
     const n = Number(numQuestions);
-    mutate({
+    if (Number.isFinite(n) && n > 0) {
+      const total = rows.reduce((acc, r) => acc + Number(r.value), 0);
+      if (total !== n) {
+        return `The sum of counts (${total}) must equal the number of questions (${n}).`;
+      }
+    }
+
+    return null;
+  };
+
+  const onSubmit = (data: QuestionGeneratorFormData) => {
+    const demographicsError = validateDemographics();
+    if (demographicsError) {
+      alert(demographicsError);
+      return;
+    }
+
+    const n = Number(numQuestions);
+
+    const body: TriggerBody = {
       prompt: data.prompt,
       model: selectedModel,
-      numQuestions: Number.isFinite(n) && n > 0 ? n : undefined,
-    });
+      ...(Number.isFinite(n) && n > 0 ? { numQuestions: n } : {}),
+      ...(enableDemographicSpec ? { demographicData } : {}),
+    };
+
+    mutate(body);
   };
 
   return (
@@ -159,6 +214,26 @@ const { mutate, isPending } = useMutation({
           selectedModel={selectedModel}
           setSelectedModel={setSelectedModel}
         />
+
+        {/* Demographic controls */}
+        <div className="space-y-3">
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={enableDemographicSpec}
+              onChange={(e) => setEnableDemographicSpec(e.target.checked)}
+            />
+            <span>Specify demographic distributions</span>
+          </label>
+
+          {enableDemographicSpec && (
+            <DemographicDistributionForm
+              demographicData={demographicData}
+              setDemographicData={setDemographicData}
+            />
+          )}
+        </div>
+
         <PromptEditor
           prompt={prompt}
           setPrompt={(value) => {
@@ -168,9 +243,11 @@ const { mutate, isPending } = useMutation({
           isCustomPrompt={isCustomPrompt}
           setIsCustomPrompt={setIsCustomPrompt}
         />
+
         {errors.prompt && (
           <p className="text-red-900 text-sm">{errors.prompt.message}</p>
         )}
+
         <GenerateButton disabled={isPending} />
       </form>
     </div>

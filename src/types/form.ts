@@ -30,3 +30,29 @@ export type PromptEditorProps ={
 export type GenerateButtonProps = {
   disabled?: boolean;
 };
+
+export type DemographicCategory = "Gender" | "Ethnicity" | "Age";
+
+export type DistRow = {
+  label: string;
+  value: number | ""; // empty while typing
+};
+
+export type DemographicData = {
+  Gender: DistRow[];
+  Ethnicity: DistRow[];
+  Age: DistRow[];
+};
+
+export type DemographicDistributionFormProps = {
+  demographicData: DemographicData;
+  setDemographicData: (data: DemographicData) => void;
+};
+
+
+export type TriggerBody = {
+  prompt: string;
+  model: string;
+  numQuestions?: number;
+  demographicData?: DemographicData;
+};
