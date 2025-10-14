@@ -1,26 +1,17 @@
-export interface ParameterSelectorProps {
-    numQuestions: string;
-    setNumQuestions: React.Dispatch<React.SetStateAction<string>>;
-    selectedDisease: string;
-    setSelectedDisease: React.Dispatch<React.SetStateAction<string>>;
-    selectedModel: string;
-    setSelectedModel: React.Dispatch<React.SetStateAction<string>>;
-  }
-
-export interface Option {
+export type Option = {
     value: string;
     label: string;
     isFree?: boolean;
   }
 
-export interface SearchableSelectProps {
+export type SearchableSelectProps = {
     placeholder: string;
     options: Option[];
     value: string;
     onChange: (value: string) => void;
   }
 
-export interface ParameterSelectorProps {
+export type ParameterSelectorProps = {
     numQuestions: string;
     setNumQuestions: React.Dispatch<React.SetStateAction<string>>;
     selectedDisease: string;
@@ -29,9 +20,13 @@ export interface ParameterSelectorProps {
     setSelectedModel: React.Dispatch<React.SetStateAction<string>>;
   }
 
-export interface PromptEditorProps {
+export type PromptEditorProps ={
     prompt: string;
     setPrompt: (prompt: string) => void;
     isCustomPrompt: boolean;
     setIsCustomPrompt: (custom: boolean) => void;
   }
+
+export type GenerateButtonProps = {
+  disabled?: boolean;
+};

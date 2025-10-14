@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ChatHeader } from "@/components/chat/ChatHeader";
-import { ChatAnswer } from "@/components/chat/ChatAnswer";
+import { ChatHeader } from "@/components/chat/ResponsePageHeader";
+import { Response } from "@/components/chat/Response";
 import { Button } from "@/components/ui/button";
 import { fetchClinicalAnalysis } from "@/api/analyzeClinical";
 import AnalyzeDropdownButton from "@/components/chat/AnalyzeDropdownButton";
@@ -11,11 +11,11 @@ import { Loader } from "@/components/clinicalScenarionAnalysis/Loader";
 const queryClient = new QueryClient();
 
 const Chat = () => {
-  const { sessionId } = useParams();
+  const { jobId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { prompt, isStreaming, numQuestions, model } = useMemo(
+  const { prompt, numQuestions, model } = useMemo(
     () => location.state,
     [location.state]
   );
@@ -68,11 +68,8 @@ const Chat = () => {
     <QueryClientProvider client={queryClient}>
       <div className="flex flex-col mx-auto p-6 space-y-4 h-screen w-[90%] max-w-screen-xl relative">
         <ChatHeader model={model} prompt={prompt} />
-        <ChatAnswer
-          sessionId={sessionId!}
-          prompt={prompt}
-          model={model}
-          isStreaming={isStreaming}
+        <Response
+          jobId={jobId!}
           onResponseReady={() => setIsResponseReady(true)}
           onResponse={(response) => setResponse(response)}
         />
