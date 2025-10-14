@@ -7,6 +7,8 @@ import GenerateButton from "@/components/form/GeneratorButton";
 import PromptEditor from "@/components/form/PromptEditor";
 import ParameterSelector from "@/components/form/ParameterSelector";
 import Header from "@/components/form/Header";
+import { triggerGeneration } from "@/api/generation";
+import { useMutation } from "@tanstack/react-query";
 
 const schema = z.object({
   prompt: z.string().min(1, "Prompt cannot be empty."),
@@ -19,7 +21,6 @@ const QuestionGeneratorForm = () => {
   const [selectedDisease, setSelectedDisease] = useState<string>("");
   const [selectedModel, setSelectedModel] = useState<string>("gpt-4o");
   const [isCustomPrompt, setIsCustomPrompt] = useState<boolean>(false);
-  const [isStreaming, setIsStreaming] = useState<boolean>(false);
   const [prompt, setPrompt] = useState<string>(`You are developing a question bank for medical exams focusing on the topic of x. 
     Please generate y high-quality, single-best-answer multiple-choice questions. 
     Follow the principles of constructing multiple-choice items in medical education. 
@@ -119,28 +120,36 @@ const QuestionGeneratorForm = () => {
     updatePrompt();
   }, [updatePrompt]);
   
-  const onSubmit = (data: QuestionGeneratorFormData) => {
-    console.log("Form submitted:", data);
-    const sessionId = crypto.randomUUID();
-    navigate(`/chat/${sessionId}`, {
+
+const { mutate, isPending } = useMutation({
+  mutationFn: triggerGeneration,
+  onSuccess: ({ job_id }) => {
+    navigate(`/chat/${job_id}`, {
       state: {
+        prompt,
         model: selectedModel,
-        prompt: data.prompt,
-        isStreaming,
-        numQuestions,
+        requestedNumQuestions: numQuestions,
       },
     });
-  };
+  },
+  onError: (err: unknown) => {
+      console.error(err);
+      alert("Failed to start generation. Please try again.");
+    },
+  });
   
-  const handleStreamingChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const checked = event.target.checked;
-    console.log("Streaming checkbox changed:", checked); 
-    setIsStreaming(checked);
-  };  
+  const onSubmit = (data: QuestionGeneratorFormData) => {
+    const n = Number(numQuestions);
+    mutate({
+      prompt: data.prompt,
+      model: selectedModel,
+      numQuestions: Number.isFinite(n) && n > 0 ? n : undefined,
+    });
+  };
 
   return (
     <div className="flex flex-col items-center px-4 py-8 max-w-screen-lg mx-auto">
-      <Header title="Generate Your Educational Materials" />
+      <Header title="Generate MCQs" />
       <form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-6">
         <ParameterSelector
           numQuestions={numQuestions}
@@ -159,19 +168,10 @@ const QuestionGeneratorForm = () => {
           isCustomPrompt={isCustomPrompt}
           setIsCustomPrompt={setIsCustomPrompt}
         />
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            id="streamingCheckbox"
-            checked={isStreaming}
-            onChange={handleStreamingChange}
-          />
-          <label htmlFor="streamingCheckbox">Enable Streaming</label>
-        </div>
         {errors.prompt && (
           <p className="text-red-900 text-sm">{errors.prompt.message}</p>
         )}
-        <GenerateButton />
+        <GenerateButton disabled={isPending} />
       </form>
     </div>
   );
