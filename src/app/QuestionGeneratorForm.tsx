@@ -4,13 +4,12 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
+import { toast } from "react-hot-toast";
 
 import GenerateButton from "@/components/form/GeneratorButton";
 import PromptEditor from "@/components/form/PromptEditor";
 import ParameterSelector from "@/components/form/ParameterSelector";
 import Header from "@/components/form/Header";
-
-
 import { triggerGeneration } from "@/api/generation";
 import { DemographicData, TriggerBody } from "@/types/form";
 import DemographicDistributionForm from "@/components/form/DemographicDistForm";
@@ -35,43 +34,42 @@ const QuestionGeneratorForm = () => {
   });
 
   const [prompt, setPrompt] = useState<string>(`You are developing a question bank for medical exams focusing on the topic of x. 
-    Please generate y high-quality, single-best-answer multiple-choice questions. 
-    Follow the principles of constructing multiple-choice items in medical education. 
-    Generate the questions using the following framework:
-    
-    **Case** (write as a single narrative paragraph without separating each part):
-    - **Patient details** (gender, age, ethnicity)
-    - **Presenting complaint**
-    - **Relevant clinical history**
-    - **Physical examination findings**
-    - **Diagnostic test results** (optional)
-    
-    **Question Stem**:
-    - Integrate relevant details from the case without revealing the answer.
-    
-    **Acceptable Question Style**:
-    - Ask for the **BEST** answer, avoiding **TRUE/FALSE** style questions.
-    
-    **Answer Options**:
-    1. [Insert plausible answer option]
-    2. [Insert plausible answer option]
-    3. [Insert plausible answer option]
-    4. [Insert plausible answer option]
-    5. [Insert plausible answer option]
-    
-    **Explanation**:
-    - Clearly identify and explain the correct answer.
-    - Justify the correct answer based on **evidence-based guidelines** or **expert consensus**.
-    - Briefly explain why the other options are incorrect or less correct.
-    
-    **Difficulty Level**: Medium
-    
-    Always mention **ethnicity** in the clinical scenario. The scenarios should reflect the reality
-    of the US population with schizophrenia. Structure the question so that the clinical 
-    scenario is separated with **'XXX'**, following this format:  
-    "...XXX <clinical scenario - the case> XXX...", so it can be extracted for analysis.
+Please generate y high-quality, single-best-answer multiple-choice questions. 
+Follow the principles of constructing multiple-choice items in medical education. 
+Generate the questions using the following framework:
 
-    `);
+**Case** (write as a single narrative paragraph without separating each part):
+- **Patient details** (gender, age, ethnicity)
+- **Presenting complaint**
+- **Relevant clinical history**
+- **Physical examination findings**
+- **Diagnostic test results** (optional)
+
+**Question Stem**:
+- Integrate relevant details from the case without revealing the answer.
+
+**Acceptable Question Style**:
+- Ask for the **BEST** answer, avoiding **TRUE/FALSE** style questions.
+
+**Answer Options**:
+1. [Insert plausible answer option]
+2. [Insert plausible answer option]
+3. [Insert plausible answer option]
+4. [Insert plausible answer option]
+5. [Insert plausible answer option]
+
+**Explanation**:
+- Clearly identify and explain the correct answer.
+- Justify the correct answer based on **evidence-based guidelines** or **expert consensus**.
+- Briefly explain why the other options are incorrect or less correct.
+
+**Difficulty Level**: Medium
+
+Always mention **ethnicity** in the clinical scenario. The scenarios should reflect the reality
+of the US population with schizophrenia. Structure the question so that the clinical 
+scenario is separated with **'XXX'**, following this format:  
+"...XXX <clinical scenario - the case> XXX...", so it can be extracted for analysis.
+`);
 
   const navigate = useNavigate();
 
@@ -87,42 +85,42 @@ const QuestionGeneratorForm = () => {
   const updatePrompt = useCallback(() => {
     if (!isCustomPrompt) {
       const generatedPrompt = `
-  You are developing a question bank for medical exams focusing on the topic of ${
-    selectedDisease || "x"
-  }. Please generate ${
+You are developing a question bank for medical exams focusing on the topic of ${
+  selectedDisease || "x"
+}. Please generate ${
         numQuestions || "y"
       } high-quality, single-best-answer multiple-choice questions. Follow the principles of constructing multiple-choice items in medical education. Generate the questions using the following framework:
-  
-  **Case** (write as a single narrative paragraph without separating each part):
-  - **Patient details** (gender, age, ethnicity)
-  - **Presenting complaint**
-  - **Relevant clinical history**
-  - **Physical examination findings**
-  - **Diagnostic test results** (optional)
-  
-  **Question Stem**:
-  - Integrate relevant details from the case without revealing the answer.
-  
-  **Acceptable Question Style**:
-  - Ask for the **BEST** answer, avoiding **TRUE/FALSE** style questions.
-  
-  **Answer Options**:
-  1. [Insert plausible answer option]
-  2. [Insert plausible answer option]
-  3. [Insert plausible answer option]
-  4. [Insert plausible answer option]
-  5. [Insert plausible answer option]
-  
-  **Explanation**:
-  - Identify and explain the correct answer.
-  - Explain why this is the most appropriate answer based on evidence-based guidelines or expert consensus.
-  - Briefly explain why the other options are incorrect or less correct.
-  
-  **Difficulty Level**: Medium
-  
-  Always mention **ethnicity** in the clinical scenario. The scenarios should reflect the reality
-  of the US population with schizophrenia. Structure the question so that the clinical 
-  scenario is separated with **'XXX'**, following this format:  
+
+**Case** (write as a single narrative paragraph without separating each part):
+- **Patient details** (gender, age, ethnicity)
+- **Presenting complaint**
+- **Relevant clinical history**
+- **Physical examination findings**
+- **Diagnostic test results** (optional)
+
+**Question Stem**:
+- Integrate relevant details from the case without revealing the answer.
+
+**Acceptable Question Style**:
+- Ask for the **BEST** answer, avoiding **TRUE/FALSE** style questions.
+
+**Answer Options**:
+1. [Insert plausible answer option]
+2. [Insert plausible answer option]
+3. [Insert plausible answer option]
+4. [Insert plausible answer option]
+5. [Insert plausible answer option]
+
+**Explanation**:
+- Identify and explain the correct answer.
+- Explain why this is the most appropriate answer based on evidence-based guidelines or expert consensus.
+- Briefly explain why the other options are incorrect or less correct.
+
+**Difficulty Level**: Medium
+
+Always mention **ethnicity** in the clinical scenario. The scenarios should reflect the reality
+of the US population with schizophrenia. Structure the question so that the clinical 
+scenario is separated with **'XXX'**, following this format:  
 "...XXX <clinical scenario - the case> XXX...", so it can be extracted for analysis.`;
       const trimmed = generatedPrompt.trim();
       setPrompt(trimmed);
@@ -148,13 +146,17 @@ const QuestionGeneratorForm = () => {
     },
     onError: (err: unknown) => {
       console.error(err);
-      alert("Failed to start generation. Please try again.");
+      toast.error("Failed to start generation. Please try again.");
     },
   });
 
-  // ---- Validation for demographics ----
+  // ---- PURE validation (no toasts here) ----
   const validateDemographics = (): string | null => {
     if (!enableDemographicSpec) return null;
+
+    if (!numQuestions || Number.isNaN(Number(numQuestions))) {
+      return "Please enter a valid number of questions when using demographic distributions.";
+    }
 
     const filledCategories = (["Gender", "Ethnicity", "Age"] as const).filter(
       (k) => demographicData[k].length > 0
@@ -186,7 +188,8 @@ const QuestionGeneratorForm = () => {
   const onSubmit = (data: QuestionGeneratorFormData) => {
     const demographicsError = validateDemographics();
     if (demographicsError) {
-      alert(demographicsError);
+      // ✅ toast only when pressing Generate
+      toast.error(demographicsError);
       return;
     }
 

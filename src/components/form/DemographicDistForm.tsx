@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   DemographicCategory,
   DemographicDistributionFormProps,
@@ -20,8 +20,13 @@ const DemographicDistributionForm = ({
   demographicData,
   setDemographicData,
 }: DemographicDistributionFormProps) => {
+  const initialCategory = useMemo<DemographicCategory>(() => {
+    const nonEmpty = CATEGORIES.find((c) => demographicData[c].length > 0);
+    return nonEmpty ?? "Gender";
+  }, [demographicData]);
+
   const [selectedCategory, setSelectedCategory] =
-    useState<DemographicCategory>("Gender");
+    useState<DemographicCategory>(initialCategory);
 
   const rows = demographicData[selectedCategory];
 
@@ -79,33 +84,72 @@ const DemographicDistributionForm = ({
         </Select>
       </div>
 
+      <div className="grid grid-cols-[1fr_180px_80px] gap-3 text-sm text-gray-600 font-medium">
+        <span>Label</span>
+        <span>Count</span>
+        <span></span>
+      </div>
+
       <div className="space-y-2">
         {rows.map((row, index) => (
           <div
             key={index}
-            className="grid grid-cols-[1fr_140px_92px] gap-2 items-center"
+            className="grid grid-cols-[1fr_180px_80px] gap-3 items-start"
           >
+            {/* Label column */}
             <Input
-              placeholder={`label (e.g. Female, Hispanic, 30–40)`}
+              placeholder={`e.g. ${
+                selectedCategory === "Gender"
+                  ? "Female"
+                  : selectedCategory === "Ethnicity"
+                  ? "Hispanic"
+                  : "30–40"
+              }`}
               value={row.label}
               onChange={(e) => handleChange(index, "label", e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") e.preventDefault();
+              }}
             />
+
+            {/* Count column */}
             <Input
               type="number"
-              placeholder="Count"
+              placeholder="0"
               value={row.value}
               onChange={(e) => handleChange(index, "value", e.target.value)}
+              min={0}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") e.preventDefault();
+              }}
             />
-            <Button variant="outline" onClick={() => handleRemoveRow(index)}>
-              <Trash />
-            </Button>
+
+            {/* Remove button */}
+            <div className="flex items-center">
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() => handleRemoveRow(index)}
+              >
+                <Trash className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
-        ))} 
+        ))}
       </div>
 
-      <Button variant="outline" onClick={handleAddRow}>
+      <Button
+        type="button" 
+        variant="outline"
+        onClick={handleAddRow}
+      >
         + Add Row
       </Button>
+
+      <p className="text-xs text-muted-foreground">
+        Fill rows in <strong>one</strong> category only. Counts must sum to the total number of questions.
+      </p>
     </div>
   );
 };
