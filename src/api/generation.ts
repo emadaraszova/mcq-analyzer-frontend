@@ -1,4 +1,5 @@
-import { JobStatusResponse, TriggerBody, TriggerResponse } from "@/types/response";
+import { TriggerBody } from "@/types/form";
+import { JobStatusResponse, TriggerResponse } from "@/types/response";
 
 export const API_BASE = "http://localhost:8000/api/generate-response";
 
@@ -17,10 +18,13 @@ async function ensureOk(res: Response, context: string) {
 
 export async function triggerGeneration(body: TriggerBody): Promise<TriggerResponse> {
   // Map FE -> BE keys
+  console.log(body)
+
   const payload = {
     message: body.prompt,
     model: body.model,
     number_of_questions: body.numQuestions,
+    demographicData: body.demographicData
   };
 
   const res = await fetch(`${API_BASE}/trigger`, {

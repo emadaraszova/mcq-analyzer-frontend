@@ -3,12 +3,16 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "react-hot-toast";
+
 import GenerateButton from "@/components/form/GeneratorButton";
 import PromptEditor from "@/components/form/PromptEditor";
 import ParameterSelector from "@/components/form/ParameterSelector";
 import Header from "@/components/form/Header";
 import { triggerGeneration } from "@/api/generation";
-import { useMutation } from "@tanstack/react-query";
+import { DemographicData, TriggerBody } from "@/types/form";
+import DemographicDistributionForm from "@/components/form/DemographicDistForm";
 
 const schema = z.object({
   prompt: z.string().min(1, "Prompt cannot be empty."),
@@ -16,48 +20,102 @@ const schema = z.object({
 
 type QuestionGeneratorFormData = z.infer<typeof schema>;
 
+/** --- Prompt builders --- **/
+const buildDefaultPrompt = (topic: string, count: string, country?: string) => `
+You are developing a question bank for medical exams focusing on the topic of ${topic || "x"}. 
+Please generate ${count || "y"} high-quality, single-best-answer multiple-choice questions. 
+Follow the principles of constructing multiple-choice items in medical education. 
+Generate the questions using the following framework:
+
+**Case** (write as a single narrative paragraph without separating each part):
+- **Patient details** (gender, age, ethnicity)
+- **Presenting complaint**
+- **Relevant clinical history**
+- **Physical examination findings**
+- **Diagnostic test results** (optional)
+
+**Question Stem**:
+- Integrate relevant details from the case without revealing the answer.
+
+**Acceptable Question Style**:
+- Ask for the **BEST** answer, avoiding **TRUE/FALSE** style questions.
+
+**Answer Options**:
+1. [Insert plausible answer option]
+2. [Insert plausible answer option]
+3. [Insert plausible answer option]
+4. [Insert plausible answer option]
+5. [Insert plausible answer option]
+
+**Explanation**:
+- Clearly identify and explain the correct answer.
+- Justify the correct answer based on **evidence-based guidelines** or **expert consensus**.
+- Briefly explain why the other options are incorrect or less correct.
+
+**Difficulty Level**: Medium
+
+Always mention **ethnicity** in the clinical scenario. The scenarios should reflect the reality
+of the population with ${topic || "x"} in ${country || "the target country"}. Structure the question so that the clinical 
+scenario is separated with **'XXX'**, following this format:  
+"...XXX <clinical scenario - the case> XXX...", so it can be extracted for analysis.`.trim();
+
+const buildDemographicPrompt = (topic: string, country?: string) => `
+You are developing a question bank for medical exams focusing on the topic of ${topic || "x"}. 
+Please generate high-quality, single-best-answer multiple-choice questions.  
+Follow the principles of constructing multiple-choice items in medical education. 
+Generate the questions using the following framework:
+
+**Case** (write as a single narrative paragraph without separating each part):
+- **Patient details** (gender, age, ethnicity)
+- **Presenting complaint**
+- **Relevant clinical history**
+- **Physical examination findings**
+- **Diagnostic test results** (optional)
+
+**Question Stem**:
+- Integrate relevant details from the case without revealing the answer.
+
+**Acceptable Question Style**:
+- Ask for the **BEST** answer, avoiding **TRUE/FALSE** style questions.
+
+**Answer Options**:
+1. [Insert plausible answer option]
+2. [Insert plausible answer option]
+3. [Insert plausible answer option]
+4. [Insert plausible answer option]
+5. [Insert plausible answer option]
+
+**Explanation**:
+- Clearly identify and explain the correct answer.
+- Justify the correct answer based on **evidence-based guidelines** or **expert consensus**.
+- Briefly explain why the other options are incorrect or less correct.
+
+**Difficulty Level**: Medium
+
+Always mention **ethnicity** in the clinical scenario. The scenarios should reflect the reality
+of the population with ${topic || "x"} in ${country || "the target country"}. Structure the question so that the clinical 
+scenario is separated with **'XXX'**, following this format:   
+"...XXX <clinical scenario - the case> XXX...", so it can be extracted for analysis.`.trim();
+/** --- end builders --- **/
+
 const QuestionGeneratorForm = () => {
   const [numQuestions, setNumQuestions] = useState<string>("");
-  const [selectedDisease, setSelectedDisease] = useState<string>("");
+  const [selectedCondition, setSelectedCondition] = useState<string>("");
   const [selectedModel, setSelectedModel] = useState<string>("gpt-4o");
   const [isCustomPrompt, setIsCustomPrompt] = useState<boolean>(false);
-  const [prompt, setPrompt] = useState<string>(`You are developing a question bank for medical exams focusing on the topic of x. 
-    Please generate y high-quality, single-best-answer multiple-choice questions. 
-    Follow the principles of constructing multiple-choice items in medical education. 
-    Generate the questions using the following framework:
-    
-    **Case** (write as a single narrative paragraph without separating each part):
-    - **Patient details** (gender, age, ethnicity)
-    - **Presenting complaint**
-    - **Relevant clinical history**
-    - **Physical examination findings**
-    - **Diagnostic test results** (optional)
-    
-    **Question Stem**:
-    - Integrate relevant details from the case without revealing the answer.
-    
-    **Acceptable Question Style**:
-    - Ask for the **BEST** answer, avoiding **TRUE/FALSE** style questions.
-    
-    **Answer Options**:
-    1. [Insert plausible answer option]
-    2. [Insert plausible answer option]
-    3. [Insert plausible answer option]
-    4. [Insert plausible answer option]
-    5. [Insert plausible answer option]
-    
-    **Explanation**:
-    - Clearly identify and explain the correct answer.
-    - Justify the correct answer based on **evidence-based guidelines** or **expert consensus**.
-    - Briefly explain why the other options are incorrect or less correct.
-    
-    **Difficulty Level**: Medium
-    
-    Always mention **ethnicity** in the clinical scenario. Structure the question so that the clinical 
-    scenario is separated with **'XXX'**, following this format:  
-    "...XXX <clinical scenario - the case> XXX...", so it can be extracted for analysis.
-    `);
-    
+  const [enableDemographicSpec, setEnableDemographicSpec] = useState(false);
+  const [country, setCountry] = useState<string>("");
+
+  const [demographicData, setDemographicData] = useState<DemographicData>({
+    Gender: [],
+    Ethnicity: [],
+    Age: [],
+  });
+
+  // Default prompt = non-demographic version
+  const [prompt, setPrompt] = useState<string>(
+    buildDefaultPrompt("x", "y", country)
+  );
 
   const navigate = useNavigate();
 
@@ -67,84 +125,103 @@ const QuestionGeneratorForm = () => {
     formState: { errors },
   } = useForm<QuestionGeneratorFormData>({
     resolver: zodResolver(schema),
-    defaultValues: {
-      prompt,
-    },
+    defaultValues: { prompt },
   });
 
+  // Update prompt automatically unless user switched to custom
   const updatePrompt = useCallback(() => {
-    if (!isCustomPrompt) {
-      const generatedPrompt = `
-  You are developing a question bank for medical exams focusing on the topic of ${
-        selectedDisease || "x"
-      }. Please generate ${
-        numQuestions || "y"
-      } high-quality, single-best-answer multiple-choice questions. Follow the principles of constructing multiple-choice items in medical education. Generate the questions using the following framework:
-  
-  **Case** (write as a single narrative paragraph without separating each part):
-  - **Patient details** (gender, age, ethnicity)
-  - **Presenting complaint**
-  - **Relevant clinical history**
-  - **Physical examination findings**
-  - **Diagnostic test results** (optional)
-  
-  **Question Stem**:
-  - Integrate relevant details from the case without revealing the answer.
-  
-  **Acceptable Question Style**:
-  - Ask for the **BEST** answer, avoiding **TRUE/FALSE** style questions.
-  
-  **Answer Options**:
-  1. [Insert plausible answer option]
-  2. [Insert plausible answer option]
-  3. [Insert plausible answer option]
-  4. [Insert plausible answer option]
-  5. [Insert plausible answer option]
-  
-  **Explanation**:
-  - Identify and explain the correct answer.
-  - Explain why this is the most appropriate answer based on evidence-based guidelines or expert consensus.
-  - Briefly explain why the other options are incorrect or less correct.
-  
-  **Difficulty Level**: Medium
-  
-  Always mention **ethnicity** in the clinical scenario. Structure the question so that the clinical scenario is separated with **'XXX'**, following this format:  
-  "...XXX <clinical scenario - the case> XXX...", so it can be extracted for analysis.`;
-  
-      setPrompt(generatedPrompt.trim());
-      setValue("prompt", generatedPrompt.trim());
-    }
-  }, [numQuestions, selectedDisease, isCustomPrompt, setValue]);
-  
+    if (isCustomPrompt) return;
+
+    const generated = enableDemographicSpec
+      ? buildDemographicPrompt(selectedCondition, country)
+      : buildDefaultPrompt(selectedCondition, numQuestions, country);
+
+    const trimmed = generated.trim();
+    setPrompt(trimmed);
+    setValue("prompt", trimmed);
+  }, [
+    isCustomPrompt,
+    enableDemographicSpec,
+    selectedCondition,
+    numQuestions,
+    country,            // ⬅️ pridané
+    setValue,
+  ]);
+
   useEffect(() => {
     updatePrompt();
   }, [updatePrompt]);
-  
 
-const { mutate, isPending } = useMutation({
-  mutationFn: triggerGeneration,
-  onSuccess: ({ job_id }) => {
-    navigate(`/chat/${job_id}`, {
-      state: {
-        prompt,
-        model: selectedModel,
-        requestedNumQuestions: numQuestions,
-      },
-    });
-  },
-  onError: (err: unknown) => {
+  const { mutate, isPending } = useMutation({
+    mutationFn: (body: TriggerBody) => triggerGeneration(body),
+    onSuccess: ({ job_id }) => {
+      navigate(`/chat/${job_id}`, {
+        state: {
+          prompt,
+          model: selectedModel,
+          requestedNumQuestions: numQuestions,
+          demographicData: enableDemographicSpec ? demographicData : null,
+        },
+      });
+    },
+    onError: (err: unknown) => {
       console.error(err);
-      alert("Failed to start generation. Please try again.");
+      toast.error("Failed to start generation. Please try again.");
     },
   });
-  
-  const onSubmit = (data: QuestionGeneratorFormData) => {
+
+  // Validate demographic data before submission
+  const validateDemographics = (): string | null => {
+    if (!enableDemographicSpec) return null;
+
+    if (!numQuestions || Number.isNaN(Number(numQuestions))) {
+      return "Please enter a valid number of questions when using demographic distributions.";
+    }
+
+    const filledCategories = (["Gender", "Ethnicity", "Age"] as const).filter(
+      (k) => demographicData[k].length > 0
+    );
+
+    if (filledCategories.length !== 1) {
+      return "Please fill exactly one category (Gender OR Ethnicity OR Age).";
+    }
+
+    const rows = demographicData[filledCategories[0]];
+    const invalidRow = rows.some(
+      (r) => !r.label || r.value === "" || Number.isNaN(Number(r.value))
+    );
+    if (invalidRow) {
+      return "All rows must have a label and a numeric value.";
+    }
+
     const n = Number(numQuestions);
-    mutate({
+    if (Number.isFinite(n) && n > 0) {
+      const total = rows.reduce((acc, r) => acc + Number(r.value), 0);
+      if (total !== n) {
+        return `The sum of counts (${total}) must equal the number of questions (${n}).`;
+      }
+    }
+
+    return null;
+  };
+
+  const onSubmit = (data: QuestionGeneratorFormData) => {
+    const demographicsError = validateDemographics();
+    if (demographicsError) {
+      toast.error(demographicsError);
+      return;
+    }
+
+    const n = Number(numQuestions);
+
+    const body: TriggerBody = {
       prompt: data.prompt,
       model: selectedModel,
-      numQuestions: Number.isFinite(n) && n > 0 ? n : undefined,
-    });
+      ...(Number.isFinite(n) && n > 0 ? { numQuestions: n } : {}),
+      ...(enableDemographicSpec ? { demographicData } : {}),
+    };
+
+    mutate(body);
   };
 
   return (
@@ -154,11 +231,33 @@ const { mutate, isPending } = useMutation({
         <ParameterSelector
           numQuestions={numQuestions}
           setNumQuestions={setNumQuestions}
-          selectedDisease={selectedDisease}
-          setSelectedDisease={setSelectedDisease}
+          selectedCondition={selectedCondition}
+          setSelectedCondition={setSelectedCondition}
           selectedModel={selectedModel}
           setSelectedModel={setSelectedModel}
+          country={country}
+          setCountry={setCountry}
         />
+
+        {/* Demographic controls */}
+        <div className="space-y-3">
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={enableDemographicSpec}
+              onChange={(e) => setEnableDemographicSpec(e.target.checked)}
+            />
+            <span>Specify demographic distributions</span>
+          </label>
+
+          {enableDemographicSpec && (
+            <DemographicDistributionForm
+              demographicData={demographicData}
+              setDemographicData={setDemographicData}
+            />
+          )}
+        </div>
+
         <PromptEditor
           prompt={prompt}
           setPrompt={(value) => {
@@ -168,9 +267,11 @@ const { mutate, isPending } = useMutation({
           isCustomPrompt={isCustomPrompt}
           setIsCustomPrompt={setIsCustomPrompt}
         />
+
         {errors.prompt && (
           <p className="text-red-900 text-sm">{errors.prompt.message}</p>
         )}
+
         <GenerateButton disabled={isPending} />
       </form>
     </div>

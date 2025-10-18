@@ -10,13 +10,6 @@ export type ChatHeaderProps = {
   prompt: string;
 }
 
-// Frontend payload 
-export type TriggerBody = {
-  prompt: string;
-  model: string;
-  numQuestions?: number;
-};
-
 // What the trigger endpoint returns
 export type TriggerResponse = { job_id: string; enqueued: boolean };
 

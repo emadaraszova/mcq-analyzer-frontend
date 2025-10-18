@@ -15,8 +15,8 @@ const PromptEditor = ({
 
   return (
     <div className="w-full">
-      <Label htmlFor="prompt" text="Prompt" />
-      <Textarea
+  <div className="mx-auto w-full max-w-3xl">
+    <Textarea
         id="prompt"
         value={prompt}
         onChange={handlePromptChange}
@@ -27,7 +27,8 @@ const PromptEditor = ({
         Edit the prompt manually or let it auto-generate based on your
         selections.
       </small>
-    </div>
+  </div>
+</div>
   );
 };
 

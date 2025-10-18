@@ -12,13 +12,15 @@ export type SearchableSelectProps = {
   }
 
 export type ParameterSelectorProps = {
-    numQuestions: string;
-    setNumQuestions: React.Dispatch<React.SetStateAction<string>>;
-    selectedDisease: string;
-    setSelectedDisease: React.Dispatch<React.SetStateAction<string>>;
-    selectedModel: string;
-    setSelectedModel: React.Dispatch<React.SetStateAction<string>>;
-  }
+  numQuestions: string;
+  setNumQuestions: (v: string) => void;
+  selectedCondition: string;
+  setSelectedCondition: (v: string) => void;
+  selectedModel: string;
+  setSelectedModel: (v: string) => void;
+  country: string;
+  setCountry: (v: string) => void;
+}
 
 export type PromptEditorProps ={
     prompt: string;
@@ -29,4 +31,30 @@ export type PromptEditorProps ={
 
 export type GenerateButtonProps = {
   disabled?: boolean;
+};
+
+export type DemographicCategory = "Gender" | "Ethnicity" | "Age";
+
+export type DistRow = {
+  label: string;
+  value: number | ""; // empty while typing
+};
+
+export type DemographicData = {
+  Gender: DistRow[];
+  Ethnicity: DistRow[];
+  Age: DistRow[];
+};
+
+export type DemographicDistributionFormProps = {
+  demographicData: DemographicData;
+  setDemographicData: (data: DemographicData) => void;
+};
+
+
+export type TriggerBody = {
+  prompt: string;
+  model: string;
+  numQuestions?: number;
+  demographicData?: DemographicData;
 };

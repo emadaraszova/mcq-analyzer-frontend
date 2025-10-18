@@ -8,6 +8,7 @@ import Main from "./app/Main";
 import UserQuestionInputPage from "./app/AnalyzerPage";
 import Navbar from "./components/main/navbar";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "react-hot-toast";
 
 const queryClient = new QueryClient();
 
@@ -17,6 +18,7 @@ const App = () => {
    <QueryClientProvider client={queryClient}> 
       <TooltipProvider>
         <Router>
+           <Toaster position="bottom-right" />
           <div className="min-h-screen bg-blue-50">
             <Navbar />
             <main className="max-w-screen-xl mx-auto px-4 py-6">

@@ -31,7 +31,7 @@ const AnalyzeDropdownButton: React.FC<AnalyzeDropdownButtonProps> = ({
             onAnalyze("gemini-2.5-flash");
           }}
         >
-          <span>Analyze with gemini-1.5-flash</span>
+          <span>Analyze with gemini-2.5-flash</span>
           <span className="ml-2 text-xs px-2 py-1 rounded bg-green-200 text-green-800">
             Free
           </span>
