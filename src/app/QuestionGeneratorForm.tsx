@@ -20,21 +20,10 @@ const schema = z.object({
 
 type QuestionGeneratorFormData = z.infer<typeof schema>;
 
-const QuestionGeneratorForm = () => {
-  const [numQuestions, setNumQuestions] = useState<string>("");
-  const [selectedDisease, setSelectedDisease] = useState<string>("");
-  const [selectedModel, setSelectedModel] = useState<string>("gpt-4o");
-  const [isCustomPrompt, setIsCustomPrompt] = useState<boolean>(false);
-  const [enableDemographicSpec, setEnableDemographicSpec] = useState(false);
-
-  const [demographicData, setDemographicData] = useState<DemographicData>({
-    Gender: [],
-    Ethnicity: [],
-    Age: [],
-  });
-
-  const [prompt, setPrompt] = useState<string>(`You are developing a question bank for medical exams focusing on the topic of x. 
-Please generate y high-quality, single-best-answer multiple-choice questions. 
+/** --- Prompt builders --- **/
+const buildDefaultPrompt = (topic: string, count: string, country?: string) => `
+You are developing a question bank for medical exams focusing on the topic of ${topic || "x"}. 
+Please generate ${count || "y"} high-quality, single-best-answer multiple-choice questions. 
 Follow the principles of constructing multiple-choice items in medical education. 
 Generate the questions using the following framework:
 
@@ -66,30 +55,15 @@ Generate the questions using the following framework:
 **Difficulty Level**: Medium
 
 Always mention **ethnicity** in the clinical scenario. The scenarios should reflect the reality
-of the US population with schizophrenia. Structure the question so that the clinical 
+of the population with ${topic || "x"} in ${country || "the target country"}. Structure the question so that the clinical 
 scenario is separated with **'XXX'**, following this format:  
-"...XXX <clinical scenario - the case> XXX...", so it can be extracted for analysis.
-`);
+"...XXX <clinical scenario - the case> XXX...", so it can be extracted for analysis.`.trim();
 
-  const navigate = useNavigate();
-
-  const {
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm<QuestionGeneratorFormData>({
-    resolver: zodResolver(schema),
-    defaultValues: { prompt },
-  });
-
-  const updatePrompt = useCallback(() => {
-    if (!isCustomPrompt) {
-      const generatedPrompt = `
-You are developing a question bank for medical exams focusing on the topic of ${
-  selectedDisease || "x"
-}. Please generate ${
-        numQuestions || "y"
-      } high-quality, single-best-answer multiple-choice questions. Follow the principles of constructing multiple-choice items in medical education. Generate the questions using the following framework:
+const buildDemographicPrompt = (topic: string, country?: string) => `
+You are developing a question bank for medical exams focusing on the topic of ${topic || "x"}. 
+Please generate high-quality, single-best-answer multiple-choice questions.  
+Follow the principles of constructing multiple-choice items in medical education. 
+Generate the questions using the following framework:
 
 **Case** (write as a single narrative paragraph without separating each part):
 - **Patient details** (gender, age, ethnicity)
@@ -112,21 +86,67 @@ You are developing a question bank for medical exams focusing on the topic of ${
 5. [Insert plausible answer option]
 
 **Explanation**:
-- Identify and explain the correct answer.
-- Explain why this is the most appropriate answer based on evidence-based guidelines or expert consensus.
+- Clearly identify and explain the correct answer.
+- Justify the correct answer based on **evidence-based guidelines** or **expert consensus**.
 - Briefly explain why the other options are incorrect or less correct.
 
 **Difficulty Level**: Medium
 
 Always mention **ethnicity** in the clinical scenario. The scenarios should reflect the reality
-of the US population with schizophrenia. Structure the question so that the clinical 
-scenario is separated with **'XXX'**, following this format:  
-"...XXX <clinical scenario - the case> XXX...", so it can be extracted for analysis.`;
-      const trimmed = generatedPrompt.trim();
-      setPrompt(trimmed);
-      setValue("prompt", trimmed);
-    }
-  }, [numQuestions, selectedDisease, isCustomPrompt, setValue]);
+of the population with ${topic || "x"} in ${country || "the target country"}. Structure the question so that the clinical 
+scenario is separated with **'XXX'**, following this format:   
+"...XXX <clinical scenario - the case> XXX...", so it can be extracted for analysis.`.trim();
+/** --- end builders --- **/
+
+const QuestionGeneratorForm = () => {
+  const [numQuestions, setNumQuestions] = useState<string>("");
+  const [selectedCondition, setSelectedCondition] = useState<string>("");
+  const [selectedModel, setSelectedModel] = useState<string>("gpt-4o");
+  const [isCustomPrompt, setIsCustomPrompt] = useState<boolean>(false);
+  const [enableDemographicSpec, setEnableDemographicSpec] = useState(false);
+  const [country, setCountry] = useState<string>("");
+
+  const [demographicData, setDemographicData] = useState<DemographicData>({
+    Gender: [],
+    Ethnicity: [],
+    Age: [],
+  });
+
+  // Default prompt = non-demographic version
+  const [prompt, setPrompt] = useState<string>(
+    buildDefaultPrompt("x", "y", country)
+  );
+
+  const navigate = useNavigate();
+
+  const {
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<QuestionGeneratorFormData>({
+    resolver: zodResolver(schema),
+    defaultValues: { prompt },
+  });
+
+  // Update prompt automatically unless user switched to custom
+  const updatePrompt = useCallback(() => {
+    if (isCustomPrompt) return;
+
+    const generated = enableDemographicSpec
+      ? buildDemographicPrompt(selectedCondition, country)
+      : buildDefaultPrompt(selectedCondition, numQuestions, country);
+
+    const trimmed = generated.trim();
+    setPrompt(trimmed);
+    setValue("prompt", trimmed);
+  }, [
+    isCustomPrompt,
+    enableDemographicSpec,
+    selectedCondition,
+    numQuestions,
+    country,            // ⬅️ pridané
+    setValue,
+  ]);
 
   useEffect(() => {
     updatePrompt();
@@ -150,7 +170,7 @@ scenario is separated with **'XXX'**, following this format:
     },
   });
 
-  // ---- PURE validation (no toasts here) ----
+  // Validate demographic data before submission
   const validateDemographics = (): string | null => {
     if (!enableDemographicSpec) return null;
 
@@ -188,7 +208,6 @@ scenario is separated with **'XXX'**, following this format:
   const onSubmit = (data: QuestionGeneratorFormData) => {
     const demographicsError = validateDemographics();
     if (demographicsError) {
-      // ✅ toast only when pressing Generate
       toast.error(demographicsError);
       return;
     }
@@ -212,10 +231,12 @@ scenario is separated with **'XXX'**, following this format:
         <ParameterSelector
           numQuestions={numQuestions}
           setNumQuestions={setNumQuestions}
-          selectedDisease={selectedDisease}
-          setSelectedDisease={setSelectedDisease}
+          selectedCondition={selectedCondition}
+          setSelectedCondition={setSelectedCondition}
           selectedModel={selectedModel}
           setSelectedModel={setSelectedModel}
+          country={country}
+          setCountry={setCountry}
         />
 
         {/* Demographic controls */}

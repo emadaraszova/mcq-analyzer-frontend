@@ -1,4 +1,4 @@
-export const diseaseOptions = [
+export const conditionOptions = [
     { value: "osteoporosis", label: "Osteoporosis" },
     { value: "sickle cell anaemia", label: "Sickle cell anaemia" },
     { value: "type 1 diabetes", label: "Type 1 diabetes" },

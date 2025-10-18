@@ -12,13 +12,15 @@ export type SearchableSelectProps = {
   }
 
 export type ParameterSelectorProps = {
-    numQuestions: string;
-    setNumQuestions: React.Dispatch<React.SetStateAction<string>>;
-    selectedDisease: string;
-    setSelectedDisease: React.Dispatch<React.SetStateAction<string>>;
-    selectedModel: string;
-    setSelectedModel: React.Dispatch<React.SetStateAction<string>>;
-  }
+  numQuestions: string;
+  setNumQuestions: (v: string) => void;
+  selectedCondition: string;
+  setSelectedCondition: (v: string) => void;
+  selectedModel: string;
+  setSelectedModel: (v: string) => void;
+  country: string;
+  setCountry: (v: string) => void;
+}
 
 export type PromptEditorProps ={
     prompt: string;
