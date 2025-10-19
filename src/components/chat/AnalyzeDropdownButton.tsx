@@ -36,6 +36,16 @@ const AnalyzeDropdownButton: React.FC<AnalyzeDropdownButtonProps> = ({
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
+            onAnalyze("llama3.3:latest");
+          }}
+        >
+          <span>Analyze with llama3.3</span>
+          <span className="ml-2 text-xs px-2 py-1 rounded bg-green-200 text-green-800">
+            Free
+          </span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => {
             onAnalyze("gpt-4o");
           }}
         >
