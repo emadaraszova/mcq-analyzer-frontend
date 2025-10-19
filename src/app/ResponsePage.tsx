@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider, useMutation } from "@tanstack/react-query";
 import { ChatHeader } from "@/components/chat/ResponsePageHeader";
-import { Response } from "@/components/chat/Response";
+import Response  from "@/components/chat/Response";
 import { Button } from "@/components/ui/button";
 import { triggerGeneration } from "@/api/analyzeClinical";
 import AnalyzeDropdownButton from "@/components/chat/AnalyzeDropdownButton";
@@ -49,6 +49,24 @@ const Chat = () => {
     });
   };
 
+  const handleDownloadTxt = () => {
+    if (!response?.trim()) return;
+    const blob = new Blob([response], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+
+    // descriptive filename (jobId + model + timestamp)
+    const ts = new Date().toISOString().replace(/[:.]/g, "-");
+    const filename = `mcqs-${jobId ?? "session"}-${model}-${ts}.txt`;
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);   // helps Safari
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     
       <div className="flex flex-col mx-auto px-6 py-2  h-full w-[90%] max-w-screen-xl relative">
@@ -60,7 +78,11 @@ const Chat = () => {
         />
         <div className="fixed bottom-0 left-0 right-0 p-4 bg-white shadow-md flex flex-col items-center ">
           <div className="flex gap-4">
-          <Button variant="outline" disabled={!isResponseReady}>
+           <Button
+            variant="outline"
+            disabled={!isResponseReady || !response.trim()}
+            onClick={handleDownloadTxt}          
+          >
             Download the MCQs
           </Button>
           <AnalyzeDropdownButton
