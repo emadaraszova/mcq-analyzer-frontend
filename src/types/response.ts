@@ -34,3 +34,9 @@ export type JobFailed = { status: "failed"; error?: string | null };
 
 // Union returned by GET /status/{job_id}
 export type JobStatusResponse = JobRunning | JobFinished | JobFailed;
+
+
+export type TriggerBody = {
+  message: string;
+  model: string; 
+}

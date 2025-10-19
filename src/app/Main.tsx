@@ -1,12 +1,11 @@
+import Header from "@/components/form/Header";
 import CardMain from "@/components/main/CardMain";
 
 const Main = () => {
   return (
     <div className="flex flex-col items-center px-6 py-4 space-y-10 max-w-screen-lg mx-auto">
       {/* Title */}
-      <h1 className="text-5xl font-bold text-center text-sky-700">
-        Welcome!
-      </h1>
+     <Header title={"Welcome!"} />
 
       {/* About Section */}
       <section

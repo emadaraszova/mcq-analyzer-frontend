@@ -1,7 +1,7 @@
-import { TriggerBody } from "@/types/form";
-import { JobStatusResponse, TriggerResponse } from "@/types/response";
+import { TriggerBody, TriggerResponse  } from "@/types/form";
+import { JobStatusResponse} from "@/types/response";
 
-export const API_BASE = "http://localhost:8000/api/generate-response";
+const API_BASE = "http://localhost:8000/api/generate-response";
 
 // Parse error body if present
 async function ensureOk(res: Response, context: string) {

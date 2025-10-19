@@ -1,66 +1,44 @@
-import { fetchClinicalAnalysis } from "@/api/analyzeClinical";
+import { triggerGeneration } from "@/api/analyzeClinical";
 import AnalyzeDropdownButton from "@/components/chat/AnalyzeDropdownButton";
 import { Loader } from "@/components/clinicalScenarionAnalysis/Loader";
 import Header from "@/components/form/Header";
 import Label from "@/components/form/Label";
 import { Textarea } from "@/components/ui/textarea";
+import { TriggerBody } from "@/types/response";
+import { useMutation } from "@tanstack/react-query";
 import React, { useState } from "react";
+import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-
-const MAX_REQUESTS_PER_MINUTE = 15;
-const INTERVAL_BETWEEN_REQUESTS = 60000 / MAX_REQUESTS_PER_MINUTE; // 4000ms (4 seconds)
 
 const UserQuestionInputPage = () => {
   const navigate = useNavigate();
   const [textareaValue, setTextareaValue] = useState("");
   const [isResponseReady, setIsResponseReady] = useState(false);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [selectedModel, setSelectedModel] = useState<string>("");
+  
 
-  const handleAnalyzeMCQs = async (selected_model: string) => {
-    try {
-      setIsAnalyzing(true);
-      setProgress(0);
-      const sessionId = crypto.randomUUID();
-
-      const extractedScenarios =
-        textareaValue
-          .match(/XXX\s*(.*?)\s*XXX/g)
-          ?.map((match) => match.replace(/XXX/g, "").trim()) || [];
-
-      const scenarioNum = extractedScenarios.length;
-      const allResults = [];
-
-      for (let i = 0; i < scenarioNum; i++) {
-        console.log(`Processing scenario ${i + 1}/${scenarioNum}`);
-
-        if (selected_model.startsWith("gemini")) {
-          await new Promise((resolve) => setTimeout(resolve, INTERVAL_BETWEEN_REQUESTS));
-        }
-
-        const data = await fetchClinicalAnalysis({
-          sessionId,
-          prompt: extractedScenarios[i],
-          model: selected_model,
-          numQuestions: "1",
-        });
-
-        allResults.push(data);
-        setProgress(((i + 1) / scenarioNum) * 100);
-      }
-
-      navigate("/analyzed-data", {
+const { mutate, isPending } = useMutation({
+    mutationFn: (body: TriggerBody) => triggerGeneration(body),
+    onSuccess: (data) => {
+      navigate(`/analyzed-data/${data.job_id}`, {
         state: {
-          analyzedData: allResults,
           originalResponse: textareaValue,
-          model: selected_model,
+          model: selectedModel,
         },
       });
-    } catch (error) {
-      console.error("Error analyzing MCQs:", error);
-    } finally {
-      setIsAnalyzing(false);
-    }
+    },
+    onError: (err: unknown) => {
+      console.error(err);
+      toast.error("Failed to start generation. Please try again.");
+    },
+  });
+
+  const handleAnalyzeMCQs = (selected_model: string) => {
+    setSelectedModel(selected_model);
+    mutate({
+      message: textareaValue,
+      model: selected_model,
+    });
   };
 
   const handleTextareaChange = (
@@ -82,24 +60,10 @@ const UserQuestionInputPage = () => {
           value={textareaValue}
           onChange={handleTextareaChange}
         />
-
-        {isAnalyzing && (
-          <div className="w-full bg-gray-200 rounded-full h-2.5 mt-4">
-            <div
-              className="bg-sky-700 h-2.5 rounded-full transition-all duration-500"
-              style={{ width: `${progress}%` }}
-            ></div>
-            <Loader />
-          </div>
-        )}
-
-        {!isAnalyzing && (
           <AnalyzeDropdownButton
-            isAnalyzing={isAnalyzing}
             isResponseReady={isResponseReady}
             onAnalyze={handleAnalyzeMCQs}
           />
-        )}
       </div>
     </div>
   );

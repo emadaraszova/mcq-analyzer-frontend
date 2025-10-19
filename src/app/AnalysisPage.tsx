@@ -1,7 +1,7 @@
 import React from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { CodeBlock, dracula } from "react-code-blocks";
-import { ClinicalAnalysisResult } from "@/types";
+
 import {
   Accordion,
   AccordionItem,
@@ -10,18 +10,49 @@ import {
 } from "@/components/ui/accordion";
 import DataAnalysisSummary from "@/components/clinicalScenarionAnalysis/DataAnalysisSummary";
 import ReactMarkdown from "react-markdown";
+import { getJobStatus } from "@/api/analyzeClinical";
+import { useQuery } from "@tanstack/react-query";
+import { Loader } from "@/components/clinicalScenarionAnalysis/Loader";
+import { JobStatusResponse } from "@/types/analyzedData";
 
 const AnalyzedDataPage = () => {
+  const { jobId } = useParams<{ jobId: string }>();
   const location = useLocation();
-  const { analyzedData, originalResponse, model } = location.state as {
-    analyzedData: ClinicalAnalysisResult;
+  const { originalResponse, model } = location.state as {
     originalResponse: string;
     model: string;
   };
 
-  const flattenedData = Array.isArray(analyzedData)
-    ? analyzedData.flatMap((item) => item.questions || [])
-    : [];
+  const { data, isLoading, isError, error } = useQuery<JobStatusResponse>({
+    queryKey: ["jobStatus", jobId],
+    queryFn: () => getJobStatus(jobId!),
+    enabled: !!jobId,
+    refetchInterval: (query) => {
+      const d = query.state.data as JobStatusResponse | undefined;
+      if (!d) return 2000;
+      return d.status === "queued" || d.status === "started" || d.status === "running"
+        ? 2000
+        : false; 
+    },
+  });
+  
+  const status = data?.status;
+  if (isLoading || status === "queued" || status === "started" || status === "running") {
+      return <Loader />;
+    }
+   if (isError) {
+    return <div className="text-red-900">Failed to fetch status. {(error as Error)?.message ?? ""}</div>;
+  }
+
+  if (status === "failed") {
+    return <div className="text-red-900">Job failed. {data?.error ?? "Check worker logs."}</div>;
+  }
+
+    
+ 
+  if (status === "finished") {
+    const result = data!.result;
+    console.log("Data", result);
 
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-6">
@@ -37,7 +68,7 @@ const AnalyzedDataPage = () => {
         gender information is mentioned in all 5 scenarios.
       </p>
 
-      <DataAnalysisSummary analyzedData={{ questions: flattenedData }} />
+      <DataAnalysisSummary analyzedData={result} />
 
       <div className="flex flex-col lg:flex-row gap-6">
         {/* First Accordion */}
@@ -54,7 +85,7 @@ const AnalyzedDataPage = () => {
                   style={{ maxHeight: "400px" }}
                 >
                   <CodeBlock
-                    text={JSON.stringify({ questions: flattenedData }, null, 2)}
+                    text={JSON.stringify({questions: result.questions}, null, 2)}
                     language="json"
                     showLineNumbers={true}
                     theme={dracula}
@@ -94,6 +125,9 @@ const AnalyzedDataPage = () => {
       </div>
     </div>
   );
+};
+
+return <div className="text-gray-500 text-center">No response yet.</div>;
 };
 
 export default AnalyzedDataPage;

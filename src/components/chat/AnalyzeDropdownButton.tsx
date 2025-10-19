@@ -8,21 +8,19 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 interface AnalyzeDropdownButtonProps {
-  isAnalyzing: boolean;
   isResponseReady: boolean;
   onAnalyze: (model: string) => void;
 }
 
 const AnalyzeDropdownButton: React.FC<AnalyzeDropdownButtonProps> = ({
-  isAnalyzing,
   isResponseReady,
   onAnalyze,
 }) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" disabled={!isResponseReady || isAnalyzing}>
-          {isAnalyzing ? "Analyzing..." : "Analyze the text"}
+        <Button variant="outline" disabled={!isResponseReady}>
+         {"Analyze the text"}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
