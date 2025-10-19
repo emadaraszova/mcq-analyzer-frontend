@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import QuestionGeneratorForm from "./app/QuestionGeneratorForm";
+import QuestionGeneratorForm from "./app/QuestionGeneratorPage";
 import Chat from "./app/ResponsePage";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 import AnalyzedDataPage from "./app/AnalysisPage";
@@ -21,12 +21,12 @@ const App = () => {
            <Toaster position="bottom-right" />
           <div className="min-h-screen bg-blue-50">
             <Navbar />
-            <main className="max-w-screen-xl mx-auto px-4 py-6">
+            <main className=" mx-auto px-4 py-6">
               <Routes>
                 <Route path="/" element={<Main />} />
                 <Route path="/generator" element={<QuestionGeneratorForm />} />
                 <Route path="/chat/:jobId" element={<Chat />} />
-                <Route path="/analyzed-data" element={<AnalyzedDataPage />} />
+                <Route path="/analyzed-data/:jobId" element={<AnalyzedDataPage />} />
                 <Route path="/analyzer" element={<UserQuestionInputPage />} />
               </Routes>
             </main>

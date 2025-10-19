@@ -9,7 +9,7 @@ const Navbar = () => {
       : "text-slate-600 hover:text-sky-700";
 
   return (
-    <nav className="sticky top-0 z-50 w-full bg-blue-50 shadow-md py-4 px-6 mb-3">
+    <nav className="sticky top-0 z-50 w-full bg-blue-50 shadow-md py-4 px-6">
       <div className="max-w-screen-lg mx-auto flex justify-between items-center">
         <ul className="flex gap-6 text-lg">
           <li>

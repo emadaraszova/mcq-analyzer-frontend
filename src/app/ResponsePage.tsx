@@ -1,12 +1,13 @@
 import React, { useMemo, useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider, useMutation } from "@tanstack/react-query";
 import { ChatHeader } from "@/components/chat/ResponsePageHeader";
 import { Response } from "@/components/chat/Response";
 import { Button } from "@/components/ui/button";
-import { fetchClinicalAnalysis } from "@/api/analyzeClinical";
+import { triggerGeneration } from "@/api/analyzeClinical";
 import AnalyzeDropdownButton from "@/components/chat/AnalyzeDropdownButton";
-import { Loader } from "@/components/clinicalScenarionAnalysis/Loader";
+import { TriggerBody } from "@/types/response";
+import toast from "react-hot-toast";
 
 const queryClient = new QueryClient();
 
@@ -15,93 +16,60 @@ const Chat = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { prompt, numQuestions, model } = useMemo(
+  const { prompt, model } = useMemo(
     () => location.state,
     [location.state]
   );
 
   const [isResponseReady, setIsResponseReady] = useState(false);
   const [response, setResponse] = useState<string>("");
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [selectedModel, setSelectedModel] = useState<string>("");
 
-  const handleAnalyzeMCQs = async (selected_model: string) => {
-    try {
-      const sessionId = crypto.randomUUID();
-      setIsAnalyzing(true);
-      setProgress(0);
-
-      const extractedScenarios = response
-        .match(/XXX\s*(.*?)\s*XXX/g)
-        ?.map(match => match.replace(/XXX/g, "").trim()) || [];
-
-      const scenarioNum = extractedScenarios.length;
-      const allResults = [];
-
-      for (let i = 0; i < scenarioNum; i++) {
-        const data = await fetchClinicalAnalysis({
-          sessionId,
-          prompt: extractedScenarios[i],
-          model: selected_model,
-          numQuestions: "1",
-        });
-
-        allResults.push(data);
-        setProgress(((i + 1) / scenarioNum) * 100);
-      }
-
-      navigate("/analyzed-data", {
+  const { mutate, isPending } = useMutation({
+    mutationFn: (body: TriggerBody) => triggerGeneration(body),
+    onSuccess: (data) => {
+      navigate(`/analyzed-data/${data.job_id}`, {
         state: {
-          analyzedData: allResults,
           originalResponse: response,
-          model: selected_model,
+          model: selectedModel,
         },
       });
-    } catch (error) {
-      console.error("Error analyzing MCQs:", error);
-    } finally {
-      setIsAnalyzing(false);
-    }
+    },
+    onError: (err: unknown) => {
+      console.error(err);
+      toast.error("Failed to start generation. Please try again.");
+    },
+  });
+
+  const handleAnalyzeMCQs = (selected_model: string) => {
+    setSelectedModel(selected_model);
+    mutate({
+      message: response,
+      model: selected_model,
+    });
   };
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <div className="flex flex-col mx-auto p-6 space-y-4 h-screen w-[90%] max-w-screen-xl relative">
+    
+      <div className="flex flex-col mx-auto px-6 py-2  h-full w-[90%] max-w-screen-xl relative">
         <ChatHeader model={model} prompt={prompt} />
         <Response
           jobId={jobId!}
           onResponseReady={() => setIsResponseReady(true)}
           onResponse={(response) => setResponse(response)}
         />
-
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white shadow-md flex flex-col items-center gap-2">
-          {isAnalyzing && (
-            <>
-              <Loader />
-              <div className="w-full bg-gray-300 rounded-full h-4 mt-2">
-                <div
-                  className="bg-sky-700 h-4 rounded-full transition-all duration-500"
-                  style={{ width: `${progress}%` }}
-                ></div>
-              </div>
-            </>
-          )}
-
-          {!isAnalyzing && (
-            <div className="flex gap-4">
-              <Button variant="outline" disabled={!isResponseReady}>
-                Download the MCQs
-              </Button>
-              <AnalyzeDropdownButton
-                isAnalyzing={isAnalyzing}
-                isResponseReady={isResponseReady}
-                onAnalyze={handleAnalyzeMCQs}
-              />
-            </div>
-          )}
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white shadow-md flex flex-col items-center ">
+          <div className="flex gap-4">
+          <Button variant="outline" disabled={!isResponseReady}>
+            Download the MCQs
+          </Button>
+          <AnalyzeDropdownButton
+            isResponseReady={isResponseReady}
+            onAnalyze={handleAnalyzeMCQs}
+          />
+          </div>
         </div>
       </div>
-    </QueryClientProvider>
   );
 };
 

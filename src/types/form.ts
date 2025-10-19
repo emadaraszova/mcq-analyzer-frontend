@@ -58,3 +58,6 @@ export type TriggerBody = {
   numQuestions?: number;
   demographicData?: DemographicData;
 };
+
+// What the trigger endpoint returns
+export type TriggerResponse = { job_id: string; enqueued: boolean };

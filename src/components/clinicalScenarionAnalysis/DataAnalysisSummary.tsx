@@ -1,7 +1,7 @@
 import React from "react";
-import { ClinicalQuestion, DataAnalysisSummaryProps } from "@/types";
 import PieChartComponent from "./PieChart";
 import AgeHistogram from "./Histogram";
+import { ClinicalAnalysisItem, DataAnalysisSummaryProps } from "@/types/analyzedData";
 
 const DataAnalysisSummary: React.FC<DataAnalysisSummaryProps> = ({
   analyzedData,
@@ -18,7 +18,7 @@ const DataAnalysisSummary: React.FC<DataAnalysisSummaryProps> = ({
 
     const totalQuestions = analyzedData.questions.length;
 
-    const keys = Object.keys(analyzedData.questions[0]) as (keyof ClinicalQuestion)[];
+    const keys = Object.keys(analyzedData.questions[0]) as (keyof ClinicalAnalysisItem)[];
     const summary: Record<string, string | { total: string; breakdown: string }> = {};
 
     const genderData: { name: string; value: number }[] = [];
@@ -76,8 +76,10 @@ const DataAnalysisSummary: React.FC<DataAnalysisSummaryProps> = ({
       } else if (key === "age") {
         analyzedData.questions.forEach((item) => {
           const age = item[key];
-          if (age && age !== "null" && age !== "unknown") {
+          if (age && typeof(age) !== "number" && age !== "null" && age !== "unknown") {
             ageValues.push(parseInt(age));
+          } else if (typeof(age) === "number") {
+            ageValues.push(age);
           }
         });
 

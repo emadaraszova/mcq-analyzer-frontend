@@ -144,7 +144,7 @@ const QuestionGeneratorForm = () => {
     enableDemographicSpec,
     selectedCondition,
     numQuestions,
-    country,            // ⬅️ pridané
+    country,            
     setValue,
   ]);
 
@@ -154,8 +154,8 @@ const QuestionGeneratorForm = () => {
 
   const { mutate, isPending } = useMutation({
     mutationFn: (body: TriggerBody) => triggerGeneration(body),
-    onSuccess: ({ job_id }) => {
-      navigate(`/chat/${job_id}`, {
+    onSuccess: (data) => {
+      navigate(`/chat/${data.job_id}`, {
         state: {
           prompt,
           model: selectedModel,

@@ -1,11 +1,9 @@
-import React, { memo } from "react";
+import React, { memo, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import ReactMarkdown from "react-markdown";
 import { getJobStatus} from "@/api/generation";
 import { Loader } from "./Loader";
 import { ResponseProps, JobStatusResponse } from "@/types/response";
-
-
 
 export const Response = memo(({ jobId, onResponseReady, onResponse }: ResponseProps) => {
   const { data, isLoading, isError, error } = useQuery<JobStatusResponse>({
@@ -23,7 +21,7 @@ export const Response = memo(({ jobId, onResponseReady, onResponse }: ResponsePr
 
 
   const status = data?.status;
-  React.useEffect(() => {
+  useEffect(() => {
     if (status !== "finished") return;
     onResponse(data!.result.response, data!.result.session_id);
     onResponseReady();
@@ -44,7 +42,7 @@ export const Response = memo(({ jobId, onResponseReady, onResponse }: ResponsePr
   if (status === "finished") {
     const { response, note } = data!.result;
      return (
-      <div className="border rounded-md p-4 bg-gray-100 overflow-y-auto h-[70%]">
+      <div className="border rounded-md p-4 bg-gray-100 overflow-y-auto h-[70vh]">
         {note && <div className="text-sm text-slate-600 mb-2">Note: {note}</div>}
         <div className="p-2 mb-2 rounded-lg bg-sky-100 text-sky-900 whitespace-pre-wrap">
           <ReactMarkdown
