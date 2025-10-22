@@ -3,7 +3,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recha
 import { Copy, Check } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { copyElementAsPng } from "@/utils/copyAsImage";
-import { AgeHistogramProps } from "@/types/analyzedData";
+import { AgeHistogramProps } from "@/types/analysisPage";
 
 
 const AgeHistogram = ({ ageData }: AgeHistogramProps) => {

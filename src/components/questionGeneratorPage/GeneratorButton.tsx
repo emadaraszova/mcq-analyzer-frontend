@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { GenerateButtonProps } from "@/types/form";
+import { GenerateButtonProps } from "@/types/questionGeneratorPage";
 
 
 const GenerateButton = ({ disabled = false }: GenerateButtonProps) => (

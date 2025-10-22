@@ -1,5 +1,5 @@
-import { TriggerBody, TriggerResponse  } from "@/types/form";
-import { JobStatusResponse} from "@/types/response";
+import { TriggerBody, TriggerResponse  } from "@/types/questionGeneratorPage";
+import { JobStatusResponse} from "@/types/responsePage";
 
 const API_BASE = "http://localhost:8000/api/generate-response";
 

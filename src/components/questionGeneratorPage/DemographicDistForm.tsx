@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import {
   DemographicCategory,
   DemographicDistributionFormProps,
-} from "@/types/form";
+} from "@/types/questionGeneratorPage";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -12,7 +12,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { Trash } from "lucide-react";
+import { Plus, Trash } from "lucide-react";
 
 const CATEGORIES: DemographicCategory[] = ["Gender", "Ethnicity", "Age"];
 
@@ -128,7 +128,7 @@ const DemographicDistributionForm = ({
             <div className="flex items-center">
               <Button
                 type="button"
-                variant="outline"
+                variant="ghost"
                 size="icon"
                 onClick={() => handleRemoveRow(index)}
               >
@@ -139,15 +139,11 @@ const DemographicDistributionForm = ({
         ))}
       </div>
 
-      <Button
-        type="button" 
-        variant="outline"
-        onClick={handleAddRow}
-      >
-        + Add Row
-      </Button>
+       <Button variant="outline" onClick={handleAddRow}>
+          <Plus className="h-4 w-4 mr-2" /> Add row
+        </Button>
 
-      <p className="text-xs text-muted-foreground">
+      <p className="text-xs text-slate-500 mt-2">
         Fill rows in <strong>one</strong> category only. Counts must sum to the total number of questions.
       </p>
     </div>

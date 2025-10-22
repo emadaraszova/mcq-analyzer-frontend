@@ -4,9 +4,9 @@ import ReactMarkdown from "react-markdown";
 import { Copy, Check } from "lucide-react";
 import { toast } from "react-hot-toast";
 
-import { getJobStatus } from "@/api/generation";
+import { getJobStatus } from "@/api/generateResponse";
 import { Loader } from "./Loader";
-import type { ResponseProps, JobStatusResponse } from "@/types/response";
+import type { ResponseProps, JobStatusResponse } from "@/types/responsePage";
 
 const Response = ({ jobId, onResponseReady, onResponse }: ResponseProps) => {
 

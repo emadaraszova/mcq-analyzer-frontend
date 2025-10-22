@@ -1,7 +1,7 @@
 import React from "react";
-import Label from "./Label";
+import Label from "../common/Label";
 import { Textarea } from "../ui/textarea";
-import { PromptEditorProps } from "@/types/form";
+import { PromptEditorProps } from "@/types/questionGeneratorPage";
 
 const PromptEditor = ({
   prompt,

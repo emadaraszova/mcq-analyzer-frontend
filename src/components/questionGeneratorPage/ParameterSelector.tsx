@@ -2,8 +2,8 @@ import React, { useMemo, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { conditionOptions, modelOptions } from "@/data/options";
 import SearchableSelect from "./SearchableSelect";
-import Label from "./Label";
-import { ParameterSelectorProps } from "@/types/form";
+import Label from "../common/Label";
+import { ParameterSelectorProps } from "@/types/questionGeneratorPage";
 
 const ParameterSelector = ({
   numQuestions,
