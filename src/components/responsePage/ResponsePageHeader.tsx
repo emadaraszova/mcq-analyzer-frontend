@@ -1,5 +1,5 @@
 import React from "react";
-import { ChatHeaderProps } from "@/types/response";
+import { ChatHeaderProps } from "@/types/responsePage";
 
 
 

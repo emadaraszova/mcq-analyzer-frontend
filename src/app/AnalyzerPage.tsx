@@ -1,16 +1,15 @@
 import { triggerGeneration } from "@/api/analyzeClinical";
-import AnalyzeDropdownButton from "@/components/chat/AnalyzeDropdownButton";
-import { Loader } from "@/components/clinicalScenarionAnalysis/Loader";
+import AnalyzeDropdownButton from "@/components/responsePage/AnalyzeDropdownButton";
 import Header from "@/components/common/Header";
 import Label from "@/components/common/Label";
 import { Textarea } from "@/components/ui/textarea";
-import { TriggerBody } from "@/types/response";
+import { TriggerBody } from "@/types/responsePage";
 import { useMutation } from "@tanstack/react-query";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
-const UserQuestionInputPage = () => {
+const AnalyzerPage = () => {
   const navigate = useNavigate();
   const [textareaValue, setTextareaValue] = useState("");
   const [isResponseReady, setIsResponseReady] = useState(false);
@@ -69,4 +68,4 @@ const { mutate, isPending } = useMutation({
   );
 };
 
-export default UserQuestionInputPage;
+export default AnalyzerPage;

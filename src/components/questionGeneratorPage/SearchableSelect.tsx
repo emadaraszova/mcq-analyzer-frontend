@@ -7,7 +7,7 @@ import {
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
-import { SearchableSelectProps } from "@/types/form";
+import { SearchableSelectProps } from "@/types/questionGeneratorPage";
 
 const SearchableSelect = ({
   placeholder,

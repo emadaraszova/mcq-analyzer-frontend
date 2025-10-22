@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -6,13 +6,13 @@ import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 
-import GenerateButton from "@/components/form/GeneratorButton";
-import PromptEditor from "@/components/form/PromptEditor";
-import ParameterSelector from "@/components/form/ParameterSelector";
+import GenerateButton from "@/components/questionGeneratorPage/GeneratorButton";
+import PromptEditor from "@/components/questionGeneratorPage/PromptEditor";
+import ParameterSelector from "@/components/questionGeneratorPage/ParameterSelector";
 import Header from "@/components/common/Header";
-import { triggerGeneration } from "@/api/generation";
-import { DemographicData, TriggerBody } from "@/types/form";
-import DemographicDistributionForm from "@/components/form/DemographicDistForm";
+import { triggerGeneration } from "@/api/generateResponse";
+import { DemographicData, TriggerBody } from "@/types/questionGeneratorPage";
+import DemographicDistributionForm from "@/components/questionGeneratorPage/DemographicDistForm";
 
 const schema = z.object({
   prompt: z.string().min(1, "Prompt cannot be empty."),
@@ -98,7 +98,7 @@ Structure the question so that the clinical scenario is separated with **'XXX'**
 "XXX <clinical scenario - the case> XXX...", so it can be extracted for analysis.`.trim();
 /** --- end builders --- **/
 
-const QuestionGeneratorForm = () => {
+const QuestionGeneratorPage = () => {
   const [numQuestions, setNumQuestions] = useState<string>("");
   const [selectedCondition, setSelectedCondition] = useState<string>("");
   const [selectedModel, setSelectedModel] = useState<string>("gpt-4o");
@@ -278,4 +278,4 @@ const QuestionGeneratorForm = () => {
   );
 };
 
-export default QuestionGeneratorForm;
+export default QuestionGeneratorPage;

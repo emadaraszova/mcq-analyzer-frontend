@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash2, Plus } from "lucide-react";
+import { Plus, Trash } from "lucide-react";
 import Label from "@/components/common/Label"; 
 import { DataEntryTableProps } from "@/types/analysisPage";
 
@@ -64,7 +64,7 @@ const DataEntryTable = ({
               onClick={() => onRemoveRow(i)}
               disabled={rows.length <= 2}
             >
-              <Trash2 className="h-4 w-4" />
+              <Trash className="h-4 w-4" />
             </Button>
           </div>
         </div>

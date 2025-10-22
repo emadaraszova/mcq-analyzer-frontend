@@ -43,7 +43,6 @@ export type TriggerBody = {
   model: string; 
 }
 
-
 export type EntryMode = "expected-freq" | "expected-prob";
 
 export type EntryModeSelectorProps = {

@@ -4,7 +4,6 @@ export type ResponseProps = {
   onResponse: (text: string, sessionId?: string) => void;
 };
 
-
 export type ChatHeaderProps = {
   model: string;
   prompt: string;

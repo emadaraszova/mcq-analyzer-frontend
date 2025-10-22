@@ -1,5 +1,5 @@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import Label from "../common/Label";
+import Label from "../../common/Label";
 import { EntryMode, EntryModeSelectorProps } from "@/types/analysisPage";
 
 

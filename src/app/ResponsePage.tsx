@@ -1,15 +1,13 @@
 import React, { useMemo, useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-import { QueryClient, QueryClientProvider, useMutation } from "@tanstack/react-query";
-import { ChatHeader } from "@/components/chat/ResponsePageHeader";
-import Response  from "@/components/chat/Response";
+import { useMutation } from "@tanstack/react-query";
+import { ChatHeader } from "@/components/responsePage/ResponsePageHeader";
+import Response  from "@/components/responsePage/Response";
 import { Button } from "@/components/ui/button";
 import { triggerGeneration } from "@/api/analyzeClinical";
-import AnalyzeDropdownButton from "@/components/chat/AnalyzeDropdownButton";
-import { TriggerBody } from "@/types/response";
+import AnalyzeDropdownButton from "@/components/responsePage/AnalyzeDropdownButton";
+import { TriggerBody } from "@/types/responsePage";
 import toast from "react-hot-toast";
-
-const queryClient = new QueryClient();
 
 const Chat = () => {
   const { jobId } = useParams();

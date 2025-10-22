@@ -6,15 +6,15 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "@/components/ui/accordion";
-import DataAnalysisSummary from "@/components/clinicalScenarionAnalysis/DataAnalysisSummary";
+import DataAnalysisSummary from "@/components/analysisPage/DataAnalysisSummary";
 import ReactMarkdown from "react-markdown";
 import { getJobStatus } from "@/api/analyzeClinical";
 import { useQuery } from "@tanstack/react-query";
-import { Loader } from "@/components/clinicalScenarionAnalysis/Loader";
+import { Loader } from "@/components/analysisPage/Loader";
 import { JobStatusResponse } from "@/types/analysisPage";
-import ChiSquareGoFCard from "@/components/chi-square/ChiSquareGoFCard";
+import ChiSquareGoFCard from "@/components/analysisPage/chi-square/ChiSquareGoFCard";
 
-const AnalyzedDataPage = () => {
+const AnalysisPage = () => {
   const { jobId } = useParams<{ jobId: string }>();
   const location = useLocation();
   const { originalResponse, model } = location.state as {
@@ -130,4 +130,4 @@ const AnalyzedDataPage = () => {
   return <div className="text-gray-500 text-center">No response yet.</div>;
 };
 
-export default AnalyzedDataPage;
+export default AnalysisPage;
