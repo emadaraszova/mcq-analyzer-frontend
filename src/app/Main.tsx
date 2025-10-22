@@ -1,4 +1,4 @@
-import Header from "@/components/form/Header";
+import Header from "@/components/common/Header";
 import CardMain from "@/components/main/CardMain";
 
 const Main = () => {

@@ -9,7 +9,7 @@ import { toast } from "react-hot-toast";
 import GenerateButton from "@/components/form/GeneratorButton";
 import PromptEditor from "@/components/form/PromptEditor";
 import ParameterSelector from "@/components/form/ParameterSelector";
-import Header from "@/components/form/Header";
+import Header from "@/components/common/Header";
 import { triggerGeneration } from "@/api/generation";
 import { DemographicData, TriggerBody } from "@/types/form";
 import DemographicDistributionForm from "@/components/form/DemographicDistForm";
@@ -54,10 +54,10 @@ Generate the questions using the following framework:
 
 **Difficulty Level**: Medium
 
-Always mention **ethnicity** in the clinical scenario. The scenarios should reflect the reality
-of the population with ${topic || "x"} in ${country || "the target country"}. Structure the question so that the clinical 
-scenario is separated with **'XXX'**, following this format:  
-"...XXX <clinical scenario - the case> XXX...", so it can be extracted for analysis.`.trim();
+Always mention **ethnicity** in the clinical scenario (case).
+The scenarios should reflect the reality of the population with ${topic || "x"} in ${country || "the target country"}.
+Structure the question so that the clinical scenario is separated with **'XXX'**, following this format:  
+"XXX <clinical scenario - the case> XXX...", so it can be extracted for analysis.`.trim();
 
 const buildDemographicPrompt = (topic: string, country?: string) => `
 You are developing a question bank for medical exams focusing on the topic of ${topic || "x"}. 
@@ -92,10 +92,10 @@ Generate the questions using the following framework:
 
 **Difficulty Level**: Medium
 
-Always mention **ethnicity** in the clinical scenario. The scenarios should reflect the reality
-of the population with ${topic || "x"} in ${country || "the target country"}. Structure the question so that the clinical 
-scenario is separated with **'XXX'**, following this format:   
-"...XXX <clinical scenario - the case> XXX...", so it can be extracted for analysis.`.trim();
+Always mention **ethnicity** in the clinical scenario (case).
+The scenarios should reflect the reality of the population with ${topic || "x"} in ${country || "the target country"}.
+Structure the question so that the clinical scenario is separated with **'XXX'**, following this format:   
+"XXX <clinical scenario - the case> XXX...", so it can be extracted for analysis.`.trim();
 /** --- end builders --- **/
 
 const QuestionGeneratorForm = () => {

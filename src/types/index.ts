@@ -1,1 +1,1 @@
-export * from './analyzedData';
+export * from './analysisPage';

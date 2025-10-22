@@ -1,7 +1,7 @@
 import React from "react";
 import PieChartComponent from "./PieChart";
 import AgeHistogram from "./Histogram";
-import { ClinicalAnalysisItem, DataAnalysisSummaryProps } from "@/types/analyzedData";
+import { ClinicalAnalysisItem, DataAnalysisSummaryProps } from "@/types/analysisPage";
 
 const DataAnalysisSummary: React.FC<DataAnalysisSummaryProps> = ({
   analyzedData,

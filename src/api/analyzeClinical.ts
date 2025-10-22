@@ -1,4 +1,4 @@
-import { JobStatusResponse, TriggerBody, TriggerResponse } from "@/types/analyzedData";
+import { JobStatusResponse, TriggerBody, TriggerResponse } from "@/types/analysisPage";
 
 const API_BASE = "http://localhost:8000/api/analyze-clinical";
 

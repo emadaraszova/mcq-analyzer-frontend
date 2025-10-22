@@ -3,7 +3,7 @@ import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
 import { Copy, Check } from "lucide-react";
 import { copyElementAsPng } from "@/utils/copyAsImage";
 import { toast } from "react-hot-toast";
-import { PieChartComponentProps } from "@/types/analyzedData";
+import { PieChartComponentProps } from "@/types/analysisPage";
 
 const COLORS = ["#6FA3EF", "#A2D9CE", "#F7DC6F", "#F1948A", "#C39BD3"];
 

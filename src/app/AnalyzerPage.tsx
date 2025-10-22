@@ -1,8 +1,8 @@
 import { triggerGeneration } from "@/api/analyzeClinical";
 import AnalyzeDropdownButton from "@/components/chat/AnalyzeDropdownButton";
 import { Loader } from "@/components/clinicalScenarionAnalysis/Loader";
-import Header from "@/components/form/Header";
-import Label from "@/components/form/Label";
+import Header from "@/components/common/Header";
+import Label from "@/components/common/Label";
 import { Textarea } from "@/components/ui/textarea";
 import { TriggerBody } from "@/types/response";
 import { useMutation } from "@tanstack/react-query";
