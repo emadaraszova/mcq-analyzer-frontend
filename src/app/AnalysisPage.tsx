@@ -14,14 +14,18 @@ import { Loader } from "@/components/analysisPage/Loader";
 import { JobStatusResponse } from "@/types/analysisPage";
 import ChiSquareGoFCard from "@/components/analysisPage/chi-square/ChiSquareGoFCard";
 
+/** --- Analysis Page --- **/
 const AnalysisPage = () => {
   const { jobId } = useParams<{ jobId: string }>();
   const location = useLocation();
+
+  // Extract passed state (original response + model used)
   const { originalResponse, model } = location.state as {
     originalResponse: string;
     model: string;
   };
 
+  // --- Fetch job status ---
   const { data, isLoading, isError, error } = useQuery<JobStatusResponse>({
     queryKey: ["jobStatus", jobId],
     queryFn: () => getJobStatus(jobId!),
@@ -39,6 +43,7 @@ const AnalysisPage = () => {
 
   const status = data?.status;
 
+  // --- Loading & error states ---
   if (
     isLoading ||
     status === "queued" ||
@@ -47,6 +52,7 @@ const AnalysisPage = () => {
   ) {
     return <Loader />;
   }
+
   if (isError) {
     return (
       <div className="text-red-900">
@@ -54,6 +60,7 @@ const AnalysisPage = () => {
       </div>
     );
   }
+
   if (status === "failed") {
     return (
       <div className="text-red-900">
@@ -62,11 +69,13 @@ const AnalysisPage = () => {
     );
   }
 
+  // --- Finished job: render results ---
   if (status === "finished") {
     const result = data!.result;
 
     return (
       <div className="max-w-6xl mx-auto p-6 space-y-6">
+        {/* Page header */}
         <h1 className="text-3xl font-bold text-center">
           Clinical Scenarios Analysis
         </h1>
@@ -79,10 +88,12 @@ const AnalysisPage = () => {
           information is mentioned in all scenarios.
         </p>
 
+        {/* Summary of analyzed data */}
         <DataAnalysisSummary analyzedData={result} />
 
+        {/* Accordions: show extracted data + original response */}
         <div className="flex flex-col lg:flex-row gap-6">
-          {/* First Accordion */}
+          {/* Extracted data accordion */}
           <div className="w-full lg:w-1/2">
             <Accordion type="multiple">
               <AccordionItem value="analyzedData">
@@ -111,7 +122,7 @@ const AnalysisPage = () => {
             </Accordion>
           </div>
 
-          {/* Second Accordion */}
+          {/* Original response accordion */}
           <div className="w-full lg:w-1/2">
             <Accordion type="multiple">
               <AccordionItem value="originalResponse">
@@ -139,12 +150,13 @@ const AnalysisPage = () => {
           </div>
         </div>
 
-        {/*Chi-Square Goodness-of-Fit calculator on the same page (expandable) */}
+        {/* Chi-Square Goodness-of-Fit calculator */}
         <ChiSquareGoFCard />
       </div>
     );
   }
 
+  // --- Default fallback ---
   return <div className="text-gray-500 text-center">No response yet.</div>;
 };
 

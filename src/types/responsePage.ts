@@ -38,3 +38,9 @@ export type TriggerBody = {
   message: string;
   model: string;
 };
+
+export type AnalyzeDropdownButtonProps = {
+  isResponseReady: boolean;
+  onAnalyze: (model: string) => void;
+  isPending: boolean;
+};

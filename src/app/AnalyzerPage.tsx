@@ -9,12 +9,16 @@ import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
+/** --- Analyzer Page --- **/
 const AnalyzerPage = () => {
   const navigate = useNavigate();
+
+  // --- Local state ---
   const [textareaValue, setTextareaValue] = useState("");
   const [isResponseReady, setIsResponseReady] = useState(false);
   const [selectedModel, setSelectedModel] = useState<string>("");
 
+  // --- API mutation: trigger analysis ---
   const { mutate, isPending } = useMutation({
     mutationFn: (body: TriggerBody) => triggerGeneration(body),
     onSuccess: (data) => {
@@ -31,6 +35,7 @@ const AnalyzerPage = () => {
     },
   });
 
+  // --- Handle analysis trigger ---
   const handleAnalyzeMCQs = (selected_model: string) => {
     setSelectedModel(selected_model);
     mutate({
@@ -39,6 +44,7 @@ const AnalyzerPage = () => {
     });
   };
 
+  // --- Handle textarea input ---
   const handleTextareaChange = (
     event: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
@@ -47,6 +53,7 @@ const AnalyzerPage = () => {
     setIsResponseReady(value.trim().length > 0);
   };
 
+  // --- UI layout ---
   return (
     <div className="flex flex-col max-w-3xl mx-auto w-full">
       <Header title={"Analyze Your Text"} />
@@ -64,6 +71,7 @@ const AnalyzerPage = () => {
         <AnalyzeDropdownButton
           isResponseReady={isResponseReady}
           onAnalyze={handleAnalyzeMCQs}
+          isPending={isPending}
         />
       </div>
     </div>

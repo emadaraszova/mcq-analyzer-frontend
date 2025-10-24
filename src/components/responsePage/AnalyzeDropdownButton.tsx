@@ -1,4 +1,3 @@
-import React from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -6,21 +5,18 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { AnalyzeDropdownButtonProps } from "@/types/responsePage";
 
-interface AnalyzeDropdownButtonProps {
-  isResponseReady: boolean;
-  onAnalyze: (model: string) => void;
-}
-
-const AnalyzeDropdownButton: React.FC<AnalyzeDropdownButtonProps> = ({
+const AnalyzeDropdownButton = ({
   isResponseReady,
   onAnalyze,
-}) => {
+  isPending,
+}: AnalyzeDropdownButtonProps) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" disabled={!isResponseReady}>
-          {"Analyze the text"}
+        <Button variant="outline" disabled={!isResponseReady || isPending}>
+          {isPending ? "Analyzing..." : "Analyze the text"}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>

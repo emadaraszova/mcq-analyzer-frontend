@@ -1,5 +1,4 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Chat from "./app/ResponsePage";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 import Navbar from "./components/mainPage/navbar";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -8,6 +7,7 @@ import AnalysisPage from "./app/AnalysisPage";
 import AnalyzerPage from "./app/AnalyzerPage";
 import QuestionGeneratorPage from "./app/QuestionGeneratorPage";
 import MainPage from "./app/MainPage";
+import ResponsePage from "./app/ResponsePage";
 
 const queryClient = new QueryClient();
 
@@ -23,7 +23,7 @@ const App = () => {
               <Routes>
                 <Route path="/" element={<MainPage />} />
                 <Route path="/generator" element={<QuestionGeneratorPage />} />
-                <Route path="/chat/:jobId" element={<Chat />} />
+                <Route path="/chat/:jobId" element={<ResponsePage />} />
                 <Route
                   path="/analyzed-data/:jobId"
                   element={<AnalysisPage />}

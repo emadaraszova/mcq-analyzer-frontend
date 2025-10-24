@@ -112,7 +112,7 @@ Structure the question so that the clinical scenario is separated with **'XXX'**
 /** --- Main component --- **/
 const QuestionGeneratorPage = () => {
   // --- UI state ---
-  const [numQuestions, setNumQuestions] = useState<string>("");
+  const [numQuestions, setNumQuestions] = useState<string>("1");
   const [selectedCondition, setSelectedCondition] = useState<string>("");
   const [selectedModel, setSelectedModel] = useState<string>("gpt-4o");
   const [isCustomPrompt, setIsCustomPrompt] = useState<boolean>(false);
