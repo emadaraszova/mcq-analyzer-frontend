@@ -1,7 +1,6 @@
 import { Input } from "@/components/ui/input";
-import Label from "@/components/common/Label"; 
+import Label from "@/components/common/Label";
 import { ResultSummaryProps } from "@/types/analysisPage";
-
 
 const ResultSummary = ({
   result,
@@ -62,8 +61,8 @@ const ResultSummary = ({
           </div>
 
           <p className="text-xs text-slate-500 mt-2">
-           Each expected count should be ≥ 5 for the chi-square
-            approximation to be reliable.
+            Each expected count should be ≥ 5 for the chi-square approximation
+            to be reliable.
           </p>
         </div>
       )}

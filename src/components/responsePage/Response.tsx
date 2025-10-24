@@ -9,8 +9,7 @@ import { Loader } from "./Loader";
 import type { ResponseProps, JobStatusResponse } from "@/types/responsePage";
 
 const Response = ({ jobId, onResponseReady, onResponse }: ResponseProps) => {
-
-   const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const { data, isLoading, isError, error } = useQuery<JobStatusResponse>({
     queryKey: ["jobStatus", jobId],
@@ -19,7 +18,9 @@ const Response = ({ jobId, onResponseReady, onResponse }: ResponseProps) => {
     refetchInterval: (query) => {
       const d = query.state.data as JobStatusResponse | undefined;
       if (!d) return 2000;
-      return d.status === "queued" || d.status === "started" || d.status === "running"
+      return d.status === "queued" ||
+        d.status === "started" ||
+        d.status === "running"
         ? 2000
         : false;
     },
@@ -55,16 +56,29 @@ const Response = ({ jobId, onResponseReady, onResponse }: ResponseProps) => {
   };
 
   // Early returns AFTER hooks are fine
-  if (isLoading || status === "queued" || status === "started" || status === "running") {
+  if (
+    isLoading ||
+    status === "queued" ||
+    status === "started" ||
+    status === "running"
+  ) {
     return <Loader />;
   }
 
   if (isError) {
-    return <div className="text-red-900">Failed to fetch status. {(error as Error)?.message ?? ""}</div>;
+    return (
+      <div className="text-red-900">
+        Failed to fetch status. {(error as Error)?.message ?? ""}
+      </div>
+    );
   }
 
   if (status === "failed") {
-    return <div className="text-red-900">Job failed. {(data as any)?.error ?? "Check worker logs."}</div>;
+    return (
+      <div className="text-red-900">
+        Job failed. {(data as any)?.error ?? "Check worker logs."}
+      </div>
+    );
   }
 
   if (status === "finished") {
@@ -73,14 +87,22 @@ const Response = ({ jobId, onResponseReady, onResponse }: ResponseProps) => {
     return (
       <div className="border rounded-md p-4 bg-gray-100 overflow-y-auto h-[70vh]">
         <div className="flex items-start justify-between mb-2">
-          {note ? <div className="text-sm text-slate-600">Note: {note}</div> : <div />}
+          {note ? (
+            <div className="text-sm text-slate-600">Note: {note}</div>
+          ) : (
+            <div />
+          )}
           <button
             onClick={handleCopy}
             className="inline-flex items-center gap-1 rounded-md border px-2 py-1 text-sm bg-white hover:bg-slate-50"
             aria-label="Copy response to clipboard"
             title="Copy response to clipboard"
           >
-            {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+            {copied ? (
+              <Check className="h-4 w-4" />
+            ) : (
+              <Copy className="h-4 w-4" />
+            )}
             {copied ? "Copied" : "Copy"}
           </button>
         </div>
@@ -88,8 +110,12 @@ const Response = ({ jobId, onResponseReady, onResponse }: ResponseProps) => {
         <div className="p-2 mb-2 rounded-lg bg-sky-100 text-sky-900 whitespace-pre-wrap">
           <ReactMarkdown
             components={{
-              strong: ({ children }) => <strong className="font-bold">{children}</strong>,
-              em: ({ children }) => <em className="italic text-gray-500">{children}</em>,
+              strong: ({ children }) => (
+                <strong className="font-bold">{children}</strong>
+              ),
+              em: ({ children }) => (
+                <em className="italic text-gray-500">{children}</em>
+              ),
             }}
           >
             {response}

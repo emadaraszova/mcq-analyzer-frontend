@@ -1,16 +1,19 @@
 export type Option = {
-    value: string;
-    label: string;
-    isFree?: boolean;
-  }
+  value: string;
+  label: string;
+  isFree?: boolean;
+};
 
 export type SearchableSelectProps = {
-    placeholder: string;
-    options: Option[];
-    value: string;
-    onChange: (value: string) => void;
-  }
-
+  id: string;
+  name?: string;
+  placeholder?: string;
+  options: Option[];
+  value: string;
+  onChange: (value: string) => void;
+  ariaLabelledBy?: string;
+  triggerClassName?: string;
+};
 export type ParameterSelectorProps = {
   numQuestions: string;
   setNumQuestions: (v: string) => void;
@@ -20,14 +23,14 @@ export type ParameterSelectorProps = {
   setSelectedModel: (v: string) => void;
   country: string;
   setCountry: (v: string) => void;
-}
+};
 
-export type PromptEditorProps ={
-    prompt: string;
-    setPrompt: (prompt: string) => void;
-    isCustomPrompt: boolean;
-    setIsCustomPrompt: (custom: boolean) => void;
-  }
+export type PromptEditorProps = {
+  prompt: string;
+  setPrompt: (prompt: string) => void;
+  isCustomPrompt: boolean;
+  setIsCustomPrompt: (custom: boolean) => void;
+};
 
 export type GenerateButtonProps = {
   disabled?: boolean;
@@ -50,7 +53,6 @@ export type DemographicDistributionFormProps = {
   demographicData: DemographicData;
   setDemographicData: (data: DemographicData) => void;
 };
-
 
 export type TriggerBody = {
   prompt: string;

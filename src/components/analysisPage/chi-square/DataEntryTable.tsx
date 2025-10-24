@@ -1,9 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, Trash } from "lucide-react";
-import Label from "@/components/common/Label"; 
+import Label from "@/components/common/Label";
 import { DataEntryTableProps } from "@/types/analysisPage";
-
 
 const DataEntryTable = ({
   rows,
@@ -40,8 +39,7 @@ const DataEntryTable = ({
             value={r.observed}
             onChange={(e) =>
               onChangeRow(i, {
-                observed:
-                  e.target.value === "" ? "" : Number(e.target.value),
+                observed: e.target.value === "" ? "" : Number(e.target.value),
               })
             }
           />
@@ -52,8 +50,7 @@ const DataEntryTable = ({
             value={r.expected}
             onChange={(e) =>
               onChangeRow(i, {
-                expected:
-                  e.target.value === "" ? "" : Number(e.target.value),
+                expected: e.target.value === "" ? "" : Number(e.target.value),
               })
             }
           />

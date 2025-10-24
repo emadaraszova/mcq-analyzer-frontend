@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { QuickActionsBarProps } from "@/types/analysisPage";
 
-
 const QuickActionsBar = ({
   onEqualExpectation,
   onNormalizeProbabilities,

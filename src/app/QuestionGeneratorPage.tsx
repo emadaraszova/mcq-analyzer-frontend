@@ -14,6 +14,7 @@ import { triggerGeneration } from "@/api/generateResponse";
 import { DemographicData, TriggerBody } from "@/types/questionGeneratorPage";
 import DemographicDistributionForm from "@/components/questionGeneratorPage/DemographicDistForm";
 
+/** --- Validation schema --- **/
 const schema = z.object({
   prompt: z.string().min(1, "Prompt cannot be empty."),
 });
@@ -21,9 +22,15 @@ const schema = z.object({
 type QuestionGeneratorFormData = z.infer<typeof schema>;
 
 /** --- Prompt builders --- **/
-const buildDefaultPrompt = (topic: string, count: string, country?: string) => `
-You are developing a question bank for medical exams focusing on the topic of ${topic || "x"}. 
-Please generate ${count || "y"} high-quality, single-best-answer multiple-choice questions. 
+// Default prompt (non-demographic)
+const buildDefaultPrompt = (topic: string, count: string, country?: string) =>
+  `
+You are developing a question bank for medical exams focusing on the topic of ${
+    topic || "x"
+  }. 
+Please generate ${
+    count || "y"
+  } high-quality, single-best-answer multiple-choice questions. 
 Follow the principles of constructing multiple-choice items in medical education. 
 Generate the questions using the following framework:
 
@@ -55,12 +62,18 @@ Generate the questions using the following framework:
 **Difficulty Level**: Medium
 
 Always mention **ethnicity** in the clinical scenario (case).
-The scenarios should reflect the reality of the population with ${topic || "x"} in ${country || "the target country"}.
+The demographic information in the scenarios should reflect the reality of the population with ${
+    topic || "x"
+  } in ${country || "the target country"}.
 Structure the question so that the clinical scenario is separated with **'XXX'**, following this format:  
 "XXX <clinical scenario - the case> XXX...", so it can be extracted for analysis.`.trim();
 
-const buildDemographicPrompt = (topic: string, country?: string) => `
-You are developing a question bank for medical exams focusing on the topic of ${topic || "x"}. 
+// Prompt variant when demographic distribution is enabled
+const buildDemographicPrompt = (topic: string, country?: string) =>
+  `
+You are developing a question bank for medical exams focusing on the topic of ${
+    topic || "x"
+  }. 
 Please generate high-quality, single-best-answer multiple-choice questions.  
 Follow the principles of constructing multiple-choice items in medical education. 
 Generate the questions using the following framework:
@@ -93,12 +106,12 @@ Generate the questions using the following framework:
 **Difficulty Level**: Medium
 
 Always mention **ethnicity** in the clinical scenario (case).
-The scenarios should reflect the reality of the population with ${topic || "x"} in ${country || "the target country"}.
 Structure the question so that the clinical scenario is separated with **'XXX'**, following this format:   
 "XXX <clinical scenario - the case> XXX...", so it can be extracted for analysis.`.trim();
-/** --- end builders --- **/
 
+/** --- Main component --- **/
 const QuestionGeneratorPage = () => {
+  // --- UI state ---
   const [numQuestions, setNumQuestions] = useState<string>("");
   const [selectedCondition, setSelectedCondition] = useState<string>("");
   const [selectedModel, setSelectedModel] = useState<string>("gpt-4o");
@@ -106,19 +119,21 @@ const QuestionGeneratorPage = () => {
   const [enableDemographicSpec, setEnableDemographicSpec] = useState(false);
   const [country, setCountry] = useState<string>("");
 
+  // Demographic data form state
   const [demographicData, setDemographicData] = useState<DemographicData>({
     Gender: [],
     Ethnicity: [],
     Age: [],
   });
 
-  // Default prompt = non-demographic version
+  // Default prompt setup
   const [prompt, setPrompt] = useState<string>(
     buildDefaultPrompt("x", "y", country)
   );
 
   const navigate = useNavigate();
 
+  // --- Form setup ---
   const {
     handleSubmit,
     setValue,
@@ -128,7 +143,7 @@ const QuestionGeneratorPage = () => {
     defaultValues: { prompt },
   });
 
-  // Update prompt automatically unless user switched to custom
+  // --- Auto-update prompt unless manually edited ---
   const updatePrompt = useCallback(() => {
     if (isCustomPrompt) return;
 
@@ -144,7 +159,7 @@ const QuestionGeneratorPage = () => {
     enableDemographicSpec,
     selectedCondition,
     numQuestions,
-    country,            
+    country,
     setValue,
   ]);
 
@@ -152,6 +167,7 @@ const QuestionGeneratorPage = () => {
     updatePrompt();
   }, [updatePrompt]);
 
+  // --- API mutation: trigger generation job ---
   const { mutate, isPending } = useMutation({
     mutationFn: (body: TriggerBody) => triggerGeneration(body),
     onSuccess: (data) => {
@@ -170,7 +186,7 @@ const QuestionGeneratorPage = () => {
     },
   });
 
-  // Validate demographic data before submission
+  // --- Demographic validation before submit ---
   const validateDemographics = (): string | null => {
     if (!enableDemographicSpec) return null;
 
@@ -205,6 +221,7 @@ const QuestionGeneratorPage = () => {
     return null;
   };
 
+  // --- Form submission handler ---
   const onSubmit = (data: QuestionGeneratorFormData) => {
     const demographicsError = validateDemographics();
     if (demographicsError) {
@@ -224,6 +241,7 @@ const QuestionGeneratorPage = () => {
     mutate(body);
   };
 
+  // --- UI layout ---
   return (
     <div className="flex flex-col items-center px-4 py-8 max-w-screen-lg mx-auto">
       <Header title="Generate MCQs" />
@@ -239,7 +257,7 @@ const QuestionGeneratorPage = () => {
           setCountry={setCountry}
         />
 
-        {/* Demographic controls */}
+        {/* Demographic toggle and form */}
         <div className="space-y-3">
           <label className="flex items-center gap-2">
             <input
@@ -258,6 +276,7 @@ const QuestionGeneratorPage = () => {
           )}
         </div>
 
+        {/* Prompt editor */}
         <PromptEditor
           prompt={prompt}
           setPrompt={(value) => {

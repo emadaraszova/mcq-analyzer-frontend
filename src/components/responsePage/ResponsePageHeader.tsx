@@ -1,8 +1,6 @@
 import React from "react";
 import { ChatHeaderProps } from "@/types/responsePage";
 
-
-
 export const ChatHeader = ({ model }: ChatHeaderProps) => {
   return (
     <div className="mb-6">

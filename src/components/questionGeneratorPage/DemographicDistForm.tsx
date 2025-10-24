@@ -139,12 +139,13 @@ const DemographicDistributionForm = ({
         ))}
       </div>
 
-       <Button variant="outline" onClick={handleAddRow}>
-          <Plus className="h-4 w-4 mr-2" /> Add row
-        </Button>
+      <Button variant="outline" onClick={handleAddRow}>
+        <Plus className="h-4 w-4 mr-2" /> Add row
+      </Button>
 
       <p className="text-xs text-slate-500 mt-2">
-        Fill rows in <strong>one</strong> category only. Counts must sum to the total number of questions.
+        Fill rows in <strong>one</strong> category only. Counts must sum to the
+        total number of questions.
       </p>
     </div>
   );

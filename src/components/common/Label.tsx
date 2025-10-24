@@ -1,13 +1,7 @@
-import React from "react";
+import { LabelProps } from "@/types/common";
 
-interface LabelProps {
-  htmlFor: string;
-  text: string;
-}
-
-const Label: React.FC<LabelProps> = ({ htmlFor, text }) => (
+const Label = ({ text }: LabelProps) => (
   <label
-    htmlFor={htmlFor}
     className="block text-sm sm:text-base font-semibold mb-2"
   >
     {text}

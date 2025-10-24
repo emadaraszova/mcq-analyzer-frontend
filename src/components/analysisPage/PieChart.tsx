@@ -7,7 +7,6 @@ import { PieChartComponentProps } from "@/types/analysisPage";
 
 const COLORS = ["#6FA3EF", "#A2D9CE", "#F7DC6F", "#F1948A", "#C39BD3"];
 
-
 const PieChartComponent = ({ title, data }: PieChartComponentProps) => {
   if (!data || data.length === 0) {
     return (
@@ -24,7 +23,10 @@ const PieChartComponent = ({ title, data }: PieChartComponentProps) => {
   const handleCopy = async () => {
     if (!chartRef.current) return;
     try {
-      const result = await copyElementAsPng(chartRef.current, `${title || "pie"}.png`);
+      const result = await copyElementAsPng(
+        chartRef.current,
+        `${title || "pie"}.png`
+      );
       if (result === "copied") {
         setCopied(true);
         toast.success("Chart copied to clipboard");
@@ -47,13 +49,20 @@ const PieChartComponent = ({ title, data }: PieChartComponentProps) => {
           className="inline-flex items-center gap-1 text-xs border rounded-md px-2 py-1 bg-white hover:bg-slate-50"
           aria-label="Copy pie chart as image"
         >
-          {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+          {copied ? (
+            <Check className="h-4 w-4" />
+          ) : (
+            <Copy className="h-4 w-4" />
+          )}
           {copied ? "Copied" : "Copy"}
         </button>
       </div>
 
       {/* Chart area */}
-      <div ref={chartRef} className="bg-white rounded-md flex justify-center items-center p-2">
+      <div
+        ref={chartRef}
+        className="bg-white rounded-md flex justify-center items-center p-2"
+      >
         <PieChart width={220} height={220}>
           <Pie
             data={data}
@@ -79,6 +88,6 @@ const PieChartComponent = ({ title, data }: PieChartComponentProps) => {
       </div>
     </div>
   );
-}
+};
 
 export default PieChartComponent;

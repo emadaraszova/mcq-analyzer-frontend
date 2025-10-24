@@ -1,14 +1,22 @@
 import { useRef, useState } from "react";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 import { Copy, Check } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { copyElementAsPng } from "@/utils/copyAsImage";
 import { AgeHistogramProps } from "@/types/analysisPage";
 
-
 const AgeHistogram = ({ ageData }: AgeHistogramProps) => {
   if (!ageData.length) {
-    return <div className="text-center text-slate-500">No age data available</div>;
+    return (
+      <div className="text-center text-slate-500">No age data available</div>
+    );
   }
 
   const minAge = Math.min(...ageData);
@@ -37,7 +45,10 @@ const AgeHistogram = ({ ageData }: AgeHistogramProps) => {
   const handleCopy = async () => {
     if (!chartRef.current) return;
     try {
-      const result = await copyElementAsPng(chartRef.current, "age-histogram.png");
+      const result = await copyElementAsPng(
+        chartRef.current,
+        "age-histogram.png"
+      );
       if (result === "copied") {
         setCopied(true);
         toast.success("Chart copied to clipboard");
@@ -54,13 +65,19 @@ const AgeHistogram = ({ ageData }: AgeHistogramProps) => {
     <div className="bg-slate-100 rounded-lg shadow-md p-4 relative">
       {/* Header row */}
       <div className="flex items-center justify-between mb-2">
-        <h2 className="text-lg font-semibold text-gray-700">Age Distribution</h2>
+        <h2 className="text-lg font-semibold text-gray-700">
+          Age Distribution
+        </h2>
         <button
           onClick={handleCopy}
           className="inline-flex items-center gap-1 text-sm border rounded-md px-2 py-1 bg-white hover:bg-slate-50"
           aria-label="Copy histogram as image"
         >
-          {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+          {copied ? (
+            <Check className="h-4 w-4" />
+          ) : (
+            <Copy className="h-4 w-4" />
+          )}
           {copied ? "Copied" : "Copy"}
         </button>
       </div>

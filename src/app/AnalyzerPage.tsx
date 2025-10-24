@@ -14,9 +14,8 @@ const AnalyzerPage = () => {
   const [textareaValue, setTextareaValue] = useState("");
   const [isResponseReady, setIsResponseReady] = useState(false);
   const [selectedModel, setSelectedModel] = useState<string>("");
-  
 
-const { mutate, isPending } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: (body: TriggerBody) => triggerGeneration(body),
     onSuccess: (data) => {
       navigate(`/analyzed-data/${data.job_id}`, {
@@ -54,15 +53,18 @@ const { mutate, isPending } = useMutation({
       <div className="flex flex-col justify-center">
         <Label htmlFor="textareaValue" text="Your text" />
         <Textarea
+          id="textareaValue"
+          name="textareaValue"
+          autoComplete="off"
           className="mb-4"
           placeholder="Paste your text here."
           value={textareaValue}
           onChange={handleTextareaChange}
         />
-          <AnalyzeDropdownButton
-            isResponseReady={isResponseReady}
-            onAnalyze={handleAnalyzeMCQs}
-          />
+        <AnalyzeDropdownButton
+          isResponseReady={isResponseReady}
+          onAnalyze={handleAnalyzeMCQs}
+        />
       </div>
     </div>
   );

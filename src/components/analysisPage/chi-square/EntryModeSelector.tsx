@@ -2,7 +2,6 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Label from "../../common/Label";
 import { EntryMode, EntryModeSelectorProps } from "@/types/analysisPage";
 
-
 const EntryModeSelector = ({ value, onChange }: EntryModeSelectorProps) => {
   return (
     <div className="bg-white border rounded-lg p-4">
@@ -25,8 +24,8 @@ const EntryModeSelector = ({ value, onChange }: EntryModeSelectorProps) => {
       </RadioGroup>
 
       <p className="text-xs text-slate-500 mt-2">
-        In probabilities mode, values must sum to 1; we convert them to expected counts
-        using your total observed.
+        In probabilities mode, values must sum to 1; we convert them to expected
+        counts using your total observed.
       </p>
     </div>
   );

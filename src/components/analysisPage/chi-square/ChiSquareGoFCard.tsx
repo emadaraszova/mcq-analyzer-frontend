@@ -15,10 +15,7 @@ const ChiSquareGoFCard = () => {
             Compare observed counts to expected counts or probabilities.
           </p>
         </div>
-        <Button
-          variant="outline"
-          onClick={() => setOpen((prev) => !prev)}
-        >
+        <Button variant="outline" onClick={() => setOpen((prev) => !prev)}>
           {open ? (
             <ChevronUp className="mr-2 h-4 w-4" />
           ) : (

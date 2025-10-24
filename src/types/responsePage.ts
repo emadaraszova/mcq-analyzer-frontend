@@ -7,7 +7,7 @@ export type ResponseProps = {
 export type ChatHeaderProps = {
   model: string;
   prompt: string;
-}
+};
 
 // What the trigger endpoint returns
 export type TriggerResponse = { job_id: string; enqueued: boolean };
@@ -34,8 +34,7 @@ export type JobFailed = { status: "failed"; error?: string | null };
 // Union returned by GET /status/{job_id}
 export type JobStatusResponse = JobRunning | JobFinished | JobFailed;
 
-
 export type TriggerBody = {
   message: string;
-  model: string; 
-}
+  model: string;
+};

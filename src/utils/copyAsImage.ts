@@ -1,6 +1,9 @@
 import { toPng } from "html-to-image";
 
-export async function copyElementAsPng(el: HTMLElement, fileName = "chart.png") {
+export async function copyElementAsPng(
+  el: HTMLElement,
+  fileName = "chart.png"
+) {
   const dataUrl = await toPng(el, {
     cacheBust: true,
     backgroundColor: "#ffffff",

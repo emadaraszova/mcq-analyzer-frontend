@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -10,10 +10,14 @@ import {
 import { SearchableSelectProps } from "@/types/questionGeneratorPage";
 
 const SearchableSelect = ({
+  id,
+  name,
+  ariaLabelledBy,
   placeholder,
   options,
   value,
   onChange,
+  triggerClassName,
 }: SearchableSelectProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredOptions, setFilteredOptions] = useState(options);
@@ -27,12 +31,18 @@ const SearchableSelect = ({
   }, [searchTerm, options]);
 
   return (
-    <Select onValueChange={(selectedValue) => onChange(selectedValue)}>
-      <SelectTrigger className="w-full">
+    <Select value={value} onValueChange={onChange}>
+      <SelectTrigger
+        id={id}
+        aria-labelledby={ariaLabelledBy} // note: aria-* stays kebab-case in JSX
+        className={`w-full ${triggerClassName ?? ""}`}
+        name={name}
+      >
         <SelectValue placeholder={placeholder}>
-          {value ? options.find((option) => option.value === value)?.label : ""}
+          {value ? options.find((o) => o.value === value)?.label : ""}
         </SelectValue>
       </SelectTrigger>
+
       <SelectContent>
         <div className="p-2">
           <Input
@@ -42,6 +52,7 @@ const SearchableSelect = ({
             className="mb-2"
           />
         </div>
+
         {filteredOptions.map((option) => (
           <SelectItem key={option.value} value={option.value}>
             <div className="flex items-center justify-between">

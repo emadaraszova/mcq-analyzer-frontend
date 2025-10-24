@@ -7,7 +7,6 @@ import ValidationMessages from "./ValidationMessage";
 import QuickActionsBar from "./QuickActionBar";
 import ResultSummary from "./ResultSummary";
 
-
 const emptyRows: Row[] = [
   { label: "Category 1", observed: "", expected: "" },
   { label: "Category 2", observed: "", expected: "" },
@@ -29,7 +28,9 @@ const ChiSquareGoF = () => {
     setRows((r) => (r.length <= 2 ? r : r.filter((_, idx) => idx !== i)));
 
   const updateRow = (i: number, patch: Partial<Row>) =>
-    setRows((r) => r.map((row, idx) => (idx === i ? { ...row, ...patch } : row)));
+    setRows((r) =>
+      r.map((row, idx) => (idx === i ? { ...row, ...patch } : row))
+    );
 
   const reset = () => {
     setRows(emptyRows);
@@ -123,7 +124,8 @@ const ChiSquareGoF = () => {
     return { issues, observed, expected };
   }, [rows, entryMode]);
 
-  const canCompute = issues.every((i) => i.type !== "error") && observed.length >= 2;
+  const canCompute =
+    issues.every((i) => i.type !== "error") && observed.length >= 2;
 
   const result = useMemo(() => {
     if (!canCompute) return null;

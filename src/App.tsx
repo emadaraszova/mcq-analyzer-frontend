@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Chat from "./app/ResponsePage";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
-import Navbar from "./components/main/navbar";
+import Navbar from "./components/mainPage/navbar";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "react-hot-toast";
 import AnalysisPage from "./app/AnalysisPage";
@@ -11,13 +11,12 @@ import MainPage from "./app/MainPage";
 
 const queryClient = new QueryClient();
 
-
 const App = () => {
   return (
-   <QueryClientProvider client={queryClient}> 
+    <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Router>
-           <Toaster position="bottom-right" />
+          <Toaster position="bottom-right" />
           <div className="min-h-screen bg-blue-50">
             <Navbar />
             <main className=" mx-auto px-4 py-6">
@@ -25,7 +24,10 @@ const App = () => {
                 <Route path="/" element={<MainPage />} />
                 <Route path="/generator" element={<QuestionGeneratorPage />} />
                 <Route path="/chat/:jobId" element={<Chat />} />
-                <Route path="/analyzed-data/:jobId" element={<AnalysisPage />} />
+                <Route
+                  path="/analyzed-data/:jobId"
+                  element={<AnalysisPage />}
+                />
                 <Route path="/analyzer" element={<AnalyzerPage />} />
               </Routes>
             </main>

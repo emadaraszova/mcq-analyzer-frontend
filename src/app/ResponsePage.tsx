@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { ChatHeader } from "@/components/responsePage/ResponsePageHeader";
-import Response  from "@/components/responsePage/Response";
+import Response from "@/components/responsePage/Response";
 import { Button } from "@/components/ui/button";
 import { triggerGeneration } from "@/api/analyzeClinical";
 import AnalyzeDropdownButton from "@/components/responsePage/AnalyzeDropdownButton";
@@ -14,10 +14,7 @@ const Chat = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { prompt, model } = useMemo(
-    () => location.state,
-    [location.state]
-  );
+  const { prompt, model } = useMemo(() => location.state, [location.state]);
 
   const [isResponseReady, setIsResponseReady] = useState(false);
   const [response, setResponse] = useState<string>("");
@@ -59,27 +56,26 @@ const Chat = () => {
     const a = document.createElement("a");
     a.href = url;
     a.download = filename;
-    document.body.appendChild(a);   // helps Safari
+    document.body.appendChild(a); // helps Safari
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
   };
 
   return (
-    
-      <div className="flex flex-col mx-auto px-6 py-2  h-full w-[90%] max-w-screen-xl relative">
-        <ChatHeader model={model} prompt={prompt} />
-        <Response
-          jobId={jobId!}
-          onResponseReady={() => setIsResponseReady(true)}
-          onResponse={(response) => setResponse(response)}
-        />
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-white shadow-md flex flex-col items-center ">
-          <div className="flex gap-4">
-           <Button
+    <div className="flex flex-col mx-auto px-6 py-2  h-full w-[90%] max-w-screen-xl relative">
+      <ChatHeader model={model} prompt={prompt} />
+      <Response
+        jobId={jobId!}
+        onResponseReady={() => setIsResponseReady(true)}
+        onResponse={(response) => setResponse(response)}
+      />
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white shadow-md flex flex-col items-center ">
+        <div className="flex gap-4">
+          <Button
             variant="outline"
             disabled={!isResponseReady || !response.trim()}
-            onClick={handleDownloadTxt}          
+            onClick={handleDownloadTxt}
           >
             Download the MCQs
           </Button>
@@ -87,9 +83,9 @@ const Chat = () => {
             isResponseReady={isResponseReady}
             onAnalyze={handleAnalyzeMCQs}
           />
-          </div>
         </div>
       </div>
+    </div>
   );
 };
 
