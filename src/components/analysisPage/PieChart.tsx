@@ -5,10 +5,11 @@ import { copyElementAsPng } from "@/utils/copyAsImage";
 import { toast } from "react-hot-toast";
 import { PieChartComponentProps } from "@/types/analysisPage";
 
+/** --- Renders a pie chart with copy/download support --- **/
 const COLORS = ["#6FA3EF", "#A2D9CE", "#F7DC6F", "#F1948A", "#C39BD3"];
 
-
 const PieChartComponent = ({ title, data }: PieChartComponentProps) => {
+  // --- Handle empty data ---
   if (!data || data.length === 0) {
     return (
       <div className="flex flex-col items-center bg-slate-100 p-4 rounded-lg shadow-md">
@@ -18,6 +19,7 @@ const PieChartComponent = ({ title, data }: PieChartComponentProps) => {
     );
   }
 
+  // --- Copy chart as image ---
   const chartRef = useRef<HTMLDivElement>(null);
   const [copied, setCopied] = useState(false);
 
@@ -37,9 +39,10 @@ const PieChartComponent = ({ title, data }: PieChartComponentProps) => {
     }
   };
 
+  // --- UI layout ---
   return (
     <div className="bg-slate-50 rounded-xl shadow-sm p-3 flex flex-col items-stretch relative">
-      {/* Header row */}
+      {/* Header with title + copy button */}
       <div className="flex items-center justify-between mb-1">
         <h3 className="text-base font-semibold text-slate-800">{title}</h3>
         <button
@@ -52,8 +55,11 @@ const PieChartComponent = ({ title, data }: PieChartComponentProps) => {
         </button>
       </div>
 
-      {/* Chart area */}
-      <div ref={chartRef} className="bg-white rounded-md flex justify-center items-center p-2">
+      {/* Chart container */}
+      <div
+        ref={chartRef}
+        className="bg-white rounded-md flex justify-center items-center p-2"
+      >
         <PieChart width={220} height={220}>
           <Pie
             data={data}
@@ -79,6 +85,6 @@ const PieChartComponent = ({ title, data }: PieChartComponentProps) => {
       </div>
     </div>
   );
-}
+};
 
 export default PieChartComponent;

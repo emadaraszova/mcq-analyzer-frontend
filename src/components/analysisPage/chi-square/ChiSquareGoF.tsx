@@ -7,18 +7,20 @@ import ValidationMessages from "./ValidationMessage";
 import QuickActionsBar from "./QuickActionBar";
 import ResultSummary from "./ResultSummary";
 
-
+/** --- Initial empty dataset --- **/
 const emptyRows: Row[] = [
   { label: "Category 1", observed: "", expected: "" },
   { label: "Category 2", observed: "", expected: "" },
 ];
 
+/** --- Chi-Square Goodness-of-Fit main component --- **/
 const ChiSquareGoF = () => {
+  // --- Local state ---
   const [entryMode, setEntryMode] = useState<EntryMode>("expected-freq");
   const [rows, setRows] = useState<Row[]>(emptyRows);
   const [alpha, setAlpha] = useState<number>(0.05);
 
-  // Helpers
+  // --- Table row helpers ---
   const addRow = () =>
     setRows((r) => [
       ...r,
@@ -29,7 +31,9 @@ const ChiSquareGoF = () => {
     setRows((r) => (r.length <= 2 ? r : r.filter((_, idx) => idx !== i)));
 
   const updateRow = (i: number, patch: Partial<Row>) =>
-    setRows((r) => r.map((row, idx) => (idx === i ? { ...row, ...patch } : row)));
+    setRows((r) =>
+      r.map((row, idx) => (idx === i ? { ...row, ...patch } : row))
+    );
 
   const reset = () => {
     setRows(emptyRows);
@@ -37,7 +41,7 @@ const ChiSquareGoF = () => {
     setAlpha(0.05);
   };
 
-  // Validation & preparation
+  // --- Validation and data preparation ---
   const { issues, observed, expected } = useMemo(() => {
     const issues: Issue[] = [];
     const numericRows = rows
@@ -46,11 +50,13 @@ const ChiSquareGoF = () => {
         o: r.observed === "" ? NaN : Number(r.observed),
         e: r.expected === "" ? NaN : Number(r.expected),
       }))
-      .filter((x) => !(Number.isNaN(x.o) && Number.isNaN(x.e))); // ignore fully blank lines
+      .filter((x) => !(Number.isNaN(x.o) && Number.isNaN(x.e))); // skip blank lines
 
+    // Basic structural checks
     if (numericRows.length < 2)
       issues.push({ type: "error", text: "Provide at least two categories." });
 
+    // Observed values validation
     const observed = numericRows.map((r) => r.o);
     if (observed.some((o) => Number.isNaN(o)))
       issues.push({
@@ -63,6 +69,7 @@ const ChiSquareGoF = () => {
     if (totalO <= 0)
       issues.push({ type: "error", text: "Total observed must be > 0." });
 
+    // Expected values or probabilities
     let expected: number[] = [];
     if (entryMode === "expected-freq") {
       expected = numericRows.map((r) => r.e);
@@ -85,7 +92,7 @@ const ChiSquareGoF = () => {
         });
       }
     } else {
-      // probabilities mode
+      // --- Probabilities mode ---
       const probs = numericRows.map((r) => r.e);
       if (probs.some((p) => Number.isNaN(p)))
         issues.push({
@@ -108,6 +115,7 @@ const ChiSquareGoF = () => {
       expected = probs.map((p) => p * totalO);
     }
 
+    // --- Warnings for small expected values ---
     if (expected.some((e) => e < 1)) {
       issues.push({
         type: "error",
@@ -123,8 +131,11 @@ const ChiSquareGoF = () => {
     return { issues, observed, expected };
   }, [rows, entryMode]);
 
-  const canCompute = issues.every((i) => i.type !== "error") && observed.length >= 2;
+  // --- Eligibility check ---
+  const canCompute =
+    issues.every((i) => i.type !== "error") && observed.length >= 2;
 
+  // --- Compute result if valid ---
   const result = useMemo(() => {
     if (!canCompute) return null;
     try {
@@ -134,7 +145,7 @@ const ChiSquareGoF = () => {
     }
   }, [canCompute, observed, expected]);
 
-  // Quick actions
+  // --- Quick actions ---
   const onEqualExpectation = () => {
     setRows((prev) => {
       const k = prev.length;
@@ -170,6 +181,7 @@ const ChiSquareGoF = () => {
     });
   };
 
+  // --- UI layout ---
   return (
     <div className="space-y-4">
       <EntryModeSelector value={entryMode} onChange={setEntryMode} />

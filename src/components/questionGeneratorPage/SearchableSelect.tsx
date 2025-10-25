@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -9,15 +9,22 @@ import {
 } from "@/components/ui/select";
 import { SearchableSelectProps } from "@/types/questionGeneratorPage";
 
+/** --- Custom searchable dropdown select with optional “Free/Paid” badges --- **/
 const SearchableSelect = ({
+  id,
+  name,
+  ariaLabelledBy,
   placeholder,
   options,
   value,
   onChange,
+  triggerClassName,
 }: SearchableSelectProps) => {
+  // --- Search input state ---
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredOptions, setFilteredOptions] = useState(options);
 
+  // --- Filter options as user types ---
   useEffect(() => {
     setFilteredOptions(
       options.filter((option) =>
@@ -26,14 +33,24 @@ const SearchableSelect = ({
     );
   }, [searchTerm, options]);
 
+  // --- UI layout ---
   return (
-    <Select onValueChange={(selectedValue) => onChange(selectedValue)}>
-      <SelectTrigger className="w-full">
+    <Select value={value} onValueChange={onChange}>
+      {/* Dropdown trigger */}
+      <SelectTrigger
+        id={id}
+        aria-labelledby={ariaLabelledBy}
+        className={`w-full ${triggerClassName ?? ""}`}
+        name={name}
+      >
         <SelectValue placeholder={placeholder}>
-          {value ? options.find((option) => option.value === value)?.label : ""}
+          {value ? options.find((o) => o.value === value)?.label : ""}
         </SelectValue>
       </SelectTrigger>
+
+      {/* Dropdown content */}
       <SelectContent>
+        {/* Search input */}
         <div className="p-2">
           <Input
             placeholder="Type to search..."
@@ -42,6 +59,8 @@ const SearchableSelect = ({
             className="mb-2"
           />
         </div>
+
+        {/* Filtered options list */}
         {filteredOptions.map((option) => (
           <SelectItem key={option.value} value={option.value}>
             <div className="flex items-center justify-between">

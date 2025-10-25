@@ -9,14 +9,17 @@ import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
+/** --- Analyzer Page --- **/
 const AnalyzerPage = () => {
   const navigate = useNavigate();
+
+  // --- Local state ---
   const [textareaValue, setTextareaValue] = useState("");
   const [isResponseReady, setIsResponseReady] = useState(false);
   const [selectedModel, setSelectedModel] = useState<string>("");
-  
 
-const { mutate, isPending } = useMutation({
+  // --- API mutation: trigger analysis ---
+  const { mutate, isPending } = useMutation({
     mutationFn: (body: TriggerBody) => triggerGeneration(body),
     onSuccess: (data) => {
       navigate(`/analyzed-data/${data.job_id}`, {
@@ -32,6 +35,7 @@ const { mutate, isPending } = useMutation({
     },
   });
 
+  // --- Handle analysis trigger ---
   const handleAnalyzeMCQs = (selected_model: string) => {
     setSelectedModel(selected_model);
     mutate({
@@ -40,6 +44,7 @@ const { mutate, isPending } = useMutation({
     });
   };
 
+  // --- Handle textarea input ---
   const handleTextareaChange = (
     event: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
@@ -48,21 +53,26 @@ const { mutate, isPending } = useMutation({
     setIsResponseReady(value.trim().length > 0);
   };
 
+  // --- UI layout ---
   return (
     <div className="flex flex-col max-w-3xl mx-auto w-full">
       <Header title={"Analyze Your Text"} />
       <div className="flex flex-col justify-center">
         <Label htmlFor="textareaValue" text="Your text" />
         <Textarea
+          id="textareaValue"
+          name="textareaValue"
+          autoComplete="off"
           className="mb-4"
           placeholder="Paste your text here."
           value={textareaValue}
           onChange={handleTextareaChange}
         />
-          <AnalyzeDropdownButton
-            isResponseReady={isResponseReady}
-            onAnalyze={handleAnalyzeMCQs}
-          />
+        <AnalyzeDropdownButton
+          isResponseReady={isResponseReady}
+          onAnalyze={handleAnalyzeMCQs}
+          isPending={isPending}
+        />
       </div>
     </div>
   );

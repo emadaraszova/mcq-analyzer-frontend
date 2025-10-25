@@ -1,4 +1,3 @@
-import React from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -6,49 +5,41 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { AnalyzeDropdownButtonProps } from "@/types/responsePage";
 
-interface AnalyzeDropdownButtonProps {
-  isResponseReady: boolean;
-  onAnalyze: (model: string) => void;
-}
-
-const AnalyzeDropdownButton: React.FC<AnalyzeDropdownButtonProps> = ({
+/** --- Dropdown button to choose model for text analysis --- **/
+const AnalyzeDropdownButton = ({
   isResponseReady,
   onAnalyze,
-}) => {
+  isPending,
+}: AnalyzeDropdownButtonProps) => {
+  // --- UI layout ---
   return (
     <DropdownMenu>
+      {/* Main button trigger */}
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" disabled={!isResponseReady}>
-         {"Analyze the text"}
+        <Button variant="outline" disabled={!isResponseReady || isPending}>
+          {isPending ? "Analyzing..." : "Analyze the text"}
         </Button>
       </DropdownMenuTrigger>
+
+      {/* Dropdown content: model options */}
       <DropdownMenuContent>
-        <DropdownMenuItem
-          onClick={() => {
-            onAnalyze("gemini-2.5-flash");
-          }}
-        >
+        <DropdownMenuItem onClick={() => onAnalyze("gemini-2.5-flash")}>
           <span>Analyze with gemini-2.5-flash</span>
           <span className="ml-2 text-xs px-2 py-1 rounded bg-green-200 text-green-800">
             Free
           </span>
         </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => {
-            onAnalyze("llama3.3:latest");
-          }}
-        >
+
+        <DropdownMenuItem onClick={() => onAnalyze("llama3.3:latest")}>
           <span>Analyze with llama3.3</span>
           <span className="ml-2 text-xs px-2 py-1 rounded bg-green-200 text-green-800">
             Free
           </span>
         </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => {
-            onAnalyze("gpt-4o");
-          }}
-        >
+
+        <DropdownMenuItem onClick={() => onAnalyze("gpt-4o")}>
           <span>Analyze with gpt-4o</span>
           <span className="ml-2 text-xs px-2 py-1 rounded bg-red-200 text-red-800">
             Paid
