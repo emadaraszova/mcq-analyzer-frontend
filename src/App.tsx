@@ -1,25 +1,31 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
-import Navbar from "./components/mainPage/navbar";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "react-hot-toast";
+
+import Navbar from "./components/mainPage/navbar";
+import MainPage from "./app/MainPage";
+import QuestionGeneratorPage from "./app/QuestionGeneratorPage";
+import ResponsePage from "./app/ResponsePage";
 import AnalysisPage from "./app/AnalysisPage";
 import AnalyzerPage from "./app/AnalyzerPage";
-import QuestionGeneratorPage from "./app/QuestionGeneratorPage";
-import MainPage from "./app/MainPage";
-import ResponsePage from "./app/ResponsePage";
 
 const queryClient = new QueryClient();
 
+/** --- Root application entry point with routing and providers --- **/
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Router>
+          {/* Toast notifications */}
           <Toaster position="bottom-right" />
+
+          {/* Global layout */}
           <div className="min-h-screen bg-blue-50">
             <Navbar />
-            <main className=" mx-auto px-4 py-6">
+            <main className="mx-auto px-4 py-6">
+              {/* --- Route definitions --- */}
               <Routes>
                 <Route path="/" element={<MainPage />} />
                 <Route path="/generator" element={<QuestionGeneratorPage />} />

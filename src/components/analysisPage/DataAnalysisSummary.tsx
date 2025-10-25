@@ -1,15 +1,13 @@
-import React from "react";
-
 import {
   ClinicalAnalysisItem,
   DataAnalysisSummaryProps,
 } from "@/types/analysisPage";
 import PieChartComponent from "./PieChart";
-import AgeHistogram from "./Histogram";
+import AgeHistogram from "./AgeHistogram";
 
-const DataAnalysisSummary: React.FC<DataAnalysisSummaryProps> = ({
-  analyzedData,
-}) => {
+/** --- Displays summarized analysis data with charts --- **/
+const DataAnalysisSummary = ({ analyzedData }: DataAnalysisSummaryProps) => {
+  // --- Compute summary statistics ---
   const calculateSummary = () => {
     if (
       !analyzedData ||
@@ -21,19 +19,19 @@ const DataAnalysisSummary: React.FC<DataAnalysisSummaryProps> = ({
     }
 
     const totalQuestions = analyzedData.questions.length;
-
     const keys = Object.keys(
       analyzedData.questions[0]
     ) as (keyof ClinicalAnalysisItem)[];
+
     const summary: Record<
       string,
       string | { total: string; breakdown: string }
     > = {};
-
     const genderData: { name: string; value: number }[] = [];
     const ethnicityCounts: Record<string, number> = {};
     const ageValues: number[] = [];
 
+    // --- Process each key in question data ---
     keys.forEach((key) => {
       if (key === "gender") {
         const genderCounts = analyzedData.questions.reduce(
@@ -127,7 +125,10 @@ const DataAnalysisSummary: React.FC<DataAnalysisSummaryProps> = ({
     });
 
     const ethnicityData = Object.entries(ethnicityCounts).map(
-      ([name, value]) => ({ name, value })
+      ([name, value]) => ({
+        name,
+        value,
+      })
     );
 
     return { summary, genderData, ethnicityData, ageData: ageValues };
@@ -139,6 +140,8 @@ const DataAnalysisSummary: React.FC<DataAnalysisSummaryProps> = ({
     ethnicityData,
     ageData = [],
   } = calculateSummary();
+
+  // --- Render analysis summary + charts ---
   return (
     <div className="bg-slate-50 p-6 rounded-lg shadow-md">
       {Object.keys(summary).length === 0 ? (
@@ -147,6 +150,7 @@ const DataAnalysisSummary: React.FC<DataAnalysisSummaryProps> = ({
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4">
+          {/* Summary cards */}
           {Object.entries(summary).map(([key, value]) => (
             <div
               key={key}
@@ -165,6 +169,8 @@ const DataAnalysisSummary: React.FC<DataAnalysisSummaryProps> = ({
               )}
             </div>
           ))}
+
+          {/* Charts */}
           <div className="grid grid-cols-2 gap-4">
             <PieChartComponent title="Gender Distribution" data={genderData} />
             <PieChartComponent
@@ -172,6 +178,7 @@ const DataAnalysisSummary: React.FC<DataAnalysisSummaryProps> = ({
               data={ethnicityData}
             />
           </div>
+
           <AgeHistogram ageData={ageData} />
         </div>
       )}

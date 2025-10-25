@@ -1,13 +1,16 @@
 import { Link, useLocation } from "react-router-dom";
 
+/** --- Top navigation bar with active link highlighting --- **/
 const Navbar = () => {
   const { pathname } = useLocation();
 
+  // --- Utility: determine active link styling ---
   const isActive = (path: string) =>
     pathname === path
       ? "text-sky-700 font-bold underline underline-offset-4"
       : "text-slate-600 hover:text-sky-700";
 
+  // --- Layout ---
   return (
     <nav className="sticky top-0 z-50 w-full bg-blue-50 shadow-md py-4 px-6">
       <div className="max-w-screen-lg mx-auto flex justify-between items-center">

@@ -5,6 +5,7 @@ import SearchableSelect from "./SearchableSelect";
 import Label from "../common/Label";
 import { ParameterSelectorProps } from "@/types/questionGeneratorPage";
 
+/** --- Selects parameters for question generation (model, condition, etc.) --- **/
 const ParameterSelector = ({
   numQuestions,
   setNumQuestions,
@@ -15,19 +16,24 @@ const ParameterSelector = ({
   country,
   setCountry,
 }: ParameterSelectorProps) => {
+  // --- Prepare available condition options for validation ---
   const optionValues = useMemo(
     () => new Set(conditionOptions.map((o: any) => o.value ?? o)),
     []
   );
+
+  // --- Manage custom (user-defined) condition ---
   const [customCondition, setCustomCondition] = useState<string>(
     optionValues.has(selectedCondition) ? "" : selectedCondition || ""
   );
 
+  // --- Handle selection from predefined options ---
   const handleSelectCondition = (value: string) => {
     setSelectedCondition(value);
     setCustomCondition("");
   };
 
+  // --- Handle manual condition input ---
   const handleCustomConditionChange = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -36,6 +42,7 @@ const ParameterSelector = ({
     setSelectedCondition(value);
   };
 
+  // --- UI layout ---
   return (
     <div className="flex flex-col space-y-4 w-full mb-5">
       {/* Row 1: Number of Questions + Model */}
@@ -87,7 +94,7 @@ const ParameterSelector = ({
             options={conditionOptions}
             value={optionValues.has(selectedCondition) ? selectedCondition : ""}
             onChange={handleSelectCondition}
-            triggerClassName="h-10 text-sm" // <- match Input height
+            triggerClassName="h-10 text-sm"
           />
           <Label htmlFor="customCondition" text="Custom condition (optional)" />
           <Input

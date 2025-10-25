@@ -1,22 +1,24 @@
+// --- Props for the response display component ---
 export type ResponseProps = {
   jobId: string;
   onResponseReady: () => void;
   onResponse: (text: string, sessionId?: string) => void;
 };
 
+// --- Props for the chat header component ---
 export type ChatHeaderProps = {
   model: string;
   prompt: string;
 };
 
-// What the trigger endpoint returns
+// --- API response when a generation job is triggered ---
 export type TriggerResponse = { job_id: string; enqueued: boolean };
 
-// Job status enums
+// --- Job status enums ---
 export type JobRunning = { status: "queued" | "running" | "started" };
-
 export type TaskResultStatus = "completed" | "partial";
 
+// --- Result of a completed analysis/generation task ---
 export type TaskResult = {
   status: TaskResultStatus;
   session_id: string;
@@ -28,17 +30,18 @@ export type TaskResult = {
   note?: string | null;
 };
 
+// --- Possible job states returned by backend ---
 export type JobFinished = { status: "finished"; result: TaskResult };
 export type JobFailed = { status: "failed"; error?: string | null };
-
-// Union returned by GET /status/{job_id}
 export type JobStatusResponse = JobRunning | JobFinished | JobFailed;
 
+// --- Request body for analysis trigger ---
 export type TriggerBody = {
   message: string;
   model: string;
 };
 
+// --- Props for the model selection dropdown ---
 export type AnalyzeDropdownButtonProps = {
   isResponseReady: boolean;
   onAnalyze: (model: string) => void;

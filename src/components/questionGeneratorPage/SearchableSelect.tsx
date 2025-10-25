@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/select";
 import { SearchableSelectProps } from "@/types/questionGeneratorPage";
 
+/** --- Custom searchable dropdown select with optional “Free/Paid” badges --- **/
 const SearchableSelect = ({
   id,
   name,
@@ -19,9 +20,11 @@ const SearchableSelect = ({
   onChange,
   triggerClassName,
 }: SearchableSelectProps) => {
+  // --- Search input state ---
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredOptions, setFilteredOptions] = useState(options);
 
+  // --- Filter options as user types ---
   useEffect(() => {
     setFilteredOptions(
       options.filter((option) =>
@@ -30,11 +33,13 @@ const SearchableSelect = ({
     );
   }, [searchTerm, options]);
 
+  // --- UI layout ---
   return (
     <Select value={value} onValueChange={onChange}>
+      {/* Dropdown trigger */}
       <SelectTrigger
         id={id}
-        aria-labelledby={ariaLabelledBy} // note: aria-* stays kebab-case in JSX
+        aria-labelledby={ariaLabelledBy}
         className={`w-full ${triggerClassName ?? ""}`}
         name={name}
       >
@@ -43,7 +48,9 @@ const SearchableSelect = ({
         </SelectValue>
       </SelectTrigger>
 
+      {/* Dropdown content */}
       <SelectContent>
+        {/* Search input */}
         <div className="p-2">
           <Input
             placeholder="Type to search..."
@@ -53,6 +60,7 @@ const SearchableSelect = ({
           />
         </div>
 
+        {/* Filtered options list */}
         {filteredOptions.map((option) => (
           <SelectItem key={option.value} value={option.value}>
             <div className="flex items-center justify-between">

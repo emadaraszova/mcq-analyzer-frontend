@@ -1,4 +1,4 @@
-// Analysis result payload coming from BE when finished
+// --- Analysis result structures from backend ---
 export type ClinicalAnalysisItem = {
   gender: string | null;
   ethnicity: string | null;
@@ -9,6 +9,7 @@ export type ClinicalAnalysisResult = {
   questions: ClinicalAnalysisItem[];
 };
 
+// --- Props for analysis-related components ---
 export type DataAnalysisSummaryProps = {
   analyzedData: ClinicalAnalysisResult;
 };
@@ -22,28 +23,29 @@ export type AgeHistogramProps = {
   ageData: number[];
 };
 
-// What the trigger endpoint returns
+// --- Response types for trigger and job status ---
 export type TriggerResponse = { job_id: string; enqueued: boolean };
 
-// Job status enums
 export type JobRunning = { status: "queued" | "running" | "started" };
-
 export type TaskResultStatus = "completed" | "partial";
 
 export type JobFinished = {
   status: "finished";
   result: ClinicalAnalysisResult;
 };
+
 export type JobFailed = { status: "failed"; error?: string | null };
 
-// Union returned by GET /status/{job_id}
+// --- Union of all possible job states ---
 export type JobStatusResponse = JobRunning | JobFinished | JobFailed;
 
+// --- Request body for triggering analysis ---
 export type TriggerBody = {
   message: string;
   model: string;
 };
 
+// --- Chi-Square Goodness-of-Fit related types ---
 export type EntryMode = "expected-freq" | "expected-prob";
 
 export type EntryModeSelectorProps = {
@@ -78,6 +80,7 @@ export type ValidationMessagesProps = {
   issues: Issue[];
 };
 
+// --- Statistical test result types ---
 export type Result = { chi2: number; df: number; pValue: number } | null;
 
 export type ResultSummaryProps = {

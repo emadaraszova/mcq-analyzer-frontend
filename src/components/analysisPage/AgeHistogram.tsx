@@ -12,13 +12,16 @@ import { toast } from "react-hot-toast";
 import { copyElementAsPng } from "@/utils/copyAsImage";
 import { AgeHistogramProps } from "@/types/analysisPage";
 
+/** --- Renders an age distribution histogram with copy/download support --- **/
 const AgeHistogram = ({ ageData }: AgeHistogramProps) => {
+  // --- Handle no data ---
   if (!ageData.length) {
     return (
       <div className="text-center text-slate-500">No age data available</div>
     );
   }
 
+  // --- Build histogram bins ---
   const minAge = Math.min(...ageData);
   const maxAge = Math.max(...ageData);
   const binSize = 5;
@@ -39,6 +42,7 @@ const AgeHistogram = ({ ageData }: AgeHistogramProps) => {
     count,
   }));
 
+  // --- Copy chart as image ---
   const chartRef = useRef<HTMLDivElement>(null);
   const [copied, setCopied] = useState(false);
 
@@ -61,9 +65,10 @@ const AgeHistogram = ({ ageData }: AgeHistogramProps) => {
     }
   };
 
+  // --- UI layout ---
   return (
     <div className="bg-slate-100 rounded-lg shadow-md p-4 relative">
-      {/* Header row */}
+      {/* Header with title + copy button */}
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-lg font-semibold text-gray-700">
           Age Distribution
@@ -82,7 +87,7 @@ const AgeHistogram = ({ ageData }: AgeHistogramProps) => {
         </button>
       </div>
 
-      {/* Chart area */}
+      {/* Chart container */}
       <div ref={chartRef} className="bg-white rounded-md p-2">
         <ResponsiveContainer width="100%" height={300}>
           <BarChart

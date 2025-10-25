@@ -14,12 +14,14 @@ import {
 } from "@/components/ui/select";
 import { Plus, Trash } from "lucide-react";
 
+/** --- Form to specify demographic distributions (Gender/Ethnicity/Age) --- **/
 const CATEGORIES: DemographicCategory[] = ["Gender", "Ethnicity", "Age"];
 
 const DemographicDistributionForm = ({
   demographicData,
   setDemographicData,
 }: DemographicDistributionFormProps) => {
+  // --- Determine initial active category (default to first non-empty or Gender) ---
   const initialCategory = useMemo<DemographicCategory>(() => {
     const nonEmpty = CATEGORIES.find((c) => demographicData[c].length > 0);
     return nonEmpty ?? "Gender";
@@ -30,12 +32,14 @@ const DemographicDistributionForm = ({
 
   const rows = demographicData[selectedCategory];
 
+  // --- Add new empty row ---
   const handleAddRow = () => {
     const updated = { ...demographicData };
     updated[selectedCategory] = [...rows, { label: "", value: "" }];
     setDemographicData(updated);
   };
 
+  // --- Handle field updates (label or value) ---
   const handleChange = (
     index: number,
     field: "label" | "value",
@@ -55,6 +59,7 @@ const DemographicDistributionForm = ({
     setDemographicData(updated);
   };
 
+  // --- Remove row ---
   const handleRemoveRow = (index: number) => {
     const updated = { ...demographicData };
     const newRows = [...rows];
@@ -63,8 +68,10 @@ const DemographicDistributionForm = ({
     setDemographicData(updated);
   };
 
+  // --- UI layout ---
   return (
     <div className="border rounded-lg p-4 bg-slate-50 space-y-4">
+      {/* Category selector */}
       <div className="flex flex-wrap gap-3 items-center">
         <span className="font-medium">Category:</span>
         <Select
@@ -84,12 +91,14 @@ const DemographicDistributionForm = ({
         </Select>
       </div>
 
+      {/* Header row */}
       <div className="grid grid-cols-[1fr_180px_80px] gap-3 text-sm text-gray-600 font-medium">
         <span>Label</span>
         <span>Count</span>
         <span></span>
       </div>
 
+      {/* Dynamic rows */}
       <div className="space-y-2">
         {rows.map((row, index) => (
           <div
@@ -139,10 +148,12 @@ const DemographicDistributionForm = ({
         ))}
       </div>
 
+      {/* Add row button */}
       <Button variant="outline" onClick={handleAddRow}>
         <Plus className="h-4 w-4 mr-2" /> Add row
       </Button>
 
+      {/* Info note */}
       <p className="text-xs text-slate-500 mt-2">
         Fill rows in <strong>one</strong> category only. Counts must sum to the
         total number of questions.

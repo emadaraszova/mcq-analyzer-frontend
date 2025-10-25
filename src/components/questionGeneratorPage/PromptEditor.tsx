@@ -1,18 +1,20 @@
-import React from "react";
 import Label from "../common/Label";
 import { Textarea } from "../ui/textarea";
 import { PromptEditorProps } from "@/types/questionGeneratorPage";
 
+/** --- Text editor for customizing or viewing the generated prompt --- **/
 const PromptEditor = ({
   prompt,
   setPrompt,
   setIsCustomPrompt,
 }: PromptEditorProps) => {
+  // --- Handle manual prompt edits ---
   const handlePromptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setPrompt(e.target.value);
-    setIsCustomPrompt(true);
+    setIsCustomPrompt(true); // mark as user-modified
   };
 
+  // --- UI layout ---
   return (
     <div className="w-full">
       <div className="mx-auto w-full max-w-3xl">

@@ -9,10 +9,10 @@ import {
 import DataAnalysisSummary from "@/components/analysisPage/DataAnalysisSummary";
 import ReactMarkdown from "react-markdown";
 import { getJobStatus } from "@/api/analyzeClinical";
-import { useQuery } from "@tanstack/react-query";
 import { Loader } from "@/components/analysisPage/Loader";
 import { JobStatusResponse } from "@/types/analysisPage";
 import ChiSquareGoFCard from "@/components/analysisPage/chi-square/ChiSquareGoFCard";
+import { useJobStatus } from "@/hook/useJobStatus";
 
 /** --- Analysis Page --- **/
 const AnalysisPage = () => {
@@ -25,21 +25,11 @@ const AnalysisPage = () => {
     model: string;
   };
 
-  // --- Fetch job status ---
-  const { data, isLoading, isError, error } = useQuery<JobStatusResponse>({
-    queryKey: ["jobStatus", jobId],
-    queryFn: () => getJobStatus(jobId!),
-    enabled: !!jobId,
-    refetchInterval: (query) => {
-      const d = query.state.data as JobStatusResponse | undefined;
-      if (!d) return 2000;
-      return d.status === "queued" ||
-        d.status === "started" ||
-        d.status === "running"
-        ? 2000
-        : false;
-    },
-  });
+  // --- Fetch job status via reusable hook ---
+  const { data, isLoading, isError, error } = useJobStatus<JobStatusResponse>(
+    jobId,
+    getJobStatus
+  );
 
   const status = data?.status;
 

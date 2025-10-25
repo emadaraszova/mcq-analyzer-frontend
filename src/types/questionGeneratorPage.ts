@@ -1,9 +1,11 @@
+// --- Shared option types for dropdowns ---
 export type Option = {
   value: string;
   label: string;
-  isFree?: boolean;
+  isFree?: boolean; // indicates whether the model or option is free
 };
 
+// --- Props for the searchable select component ---
 export type SearchableSelectProps = {
   id: string;
   name?: string;
@@ -14,6 +16,8 @@ export type SearchableSelectProps = {
   ariaLabelledBy?: string;
   triggerClassName?: string;
 };
+
+// --- Props for the parameter selection section ---
 export type ParameterSelectorProps = {
   numQuestions: string;
   setNumQuestions: (v: string) => void;
@@ -25,6 +29,7 @@ export type ParameterSelectorProps = {
   setCountry: (v: string) => void;
 };
 
+// --- Props for the editable prompt area ---
 export type PromptEditorProps = {
   prompt: string;
   setPrompt: (prompt: string) => void;
@@ -32,15 +37,17 @@ export type PromptEditorProps = {
   setIsCustomPrompt: (custom: boolean) => void;
 };
 
+// --- Props for the generate button ---
 export type GenerateButtonProps = {
   disabled?: boolean;
 };
 
+// --- Demographic distribution structures ---
 export type DemographicCategory = "Gender" | "Ethnicity" | "Age";
 
 export type DistRow = {
   label: string;
-  value: number | ""; // empty while typing
+  value: number | ""; // empty string while typing
 };
 
 export type DemographicData = {
@@ -49,11 +56,13 @@ export type DemographicData = {
   Age: DistRow[];
 };
 
+// --- Props for demographic distribution form ---
 export type DemographicDistributionFormProps = {
   demographicData: DemographicData;
   setDemographicData: (data: DemographicData) => void;
 };
 
+// --- API body and response types ---
 export type TriggerBody = {
   prompt: string;
   model: string;
@@ -61,5 +70,4 @@ export type TriggerBody = {
   demographicData?: DemographicData;
 };
 
-// What the trigger endpoint returns
 export type TriggerResponse = { job_id: string; enqueued: boolean };

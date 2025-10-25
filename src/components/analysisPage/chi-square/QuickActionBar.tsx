@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { QuickActionsBarProps } from "@/types/analysisPage";
 
+/** --- Toolbar for quick data-entry actions --- **/
 const QuickActionsBar = ({
   onEqualExpectation,
   onNormalizeProbabilities,
@@ -9,9 +10,12 @@ const QuickActionsBar = ({
 }: QuickActionsBarProps) => {
   return (
     <div className="flex flex-wrap gap-2">
+      {/* Equal expectation across categories */}
       <Button variant="secondary" onClick={onEqualExpectation}>
         Set equal expectation
       </Button>
+
+      {/* Normalize probabilities (only available in probability mode) */}
       <Button
         variant="secondary"
         onClick={onNormalizeProbabilities}
@@ -20,6 +24,8 @@ const QuickActionsBar = ({
       >
         Normalize probabilities
       </Button>
+
+      {/* Reset all fields */}
       <Button variant="ghost" onClick={onReset}>
         Reset
       </Button>

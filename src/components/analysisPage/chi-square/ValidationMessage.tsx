@@ -1,5 +1,6 @@
 import { ValidationMessagesProps } from "@/types/analysisPage";
 
+/** --- Calculator input validation messages  --- **/
 const ValidationMessages = ({ issues }: ValidationMessagesProps) => {
   if (!issues.length) return null;
 
