@@ -3,6 +3,7 @@ export type ResponseProps = {
   jobId: string;
   onResponseReady: () => void;
   onResponse: (text: string, sessionId?: string) => void;
+  onNote?: (note?: string) => void;
 };
 
 // --- Props for the chat header component ---
@@ -46,4 +47,5 @@ export type AnalyzeDropdownButtonProps = {
   isResponseReady: boolean;
   onAnalyze: (model: string) => void;
   isPending: boolean;
+  blockAnalyze?: boolean;
 };

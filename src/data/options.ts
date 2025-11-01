@@ -12,4 +12,9 @@ export const modelOptions = [
   { value: "gemini-2.5-flash", label: "gemini-2.5-flash", isFree: true },
   { value: "gemini-2.5-pro", label: "gemini-2.5-pro", isFree: true },
   { value: "llama3.3:latest", label: "llama3.3:latest", isFree: true },
+  {
+    value: "llama-4-scout-17b-16e-instruct",
+    label: "llama-4-scout-17b-16e-instruct",
+    isFree: true,
+  },
 ];

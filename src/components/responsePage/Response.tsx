@@ -9,7 +9,12 @@ import { useJobStatus } from "@/hook/useJobStatus";
 import type { ResponseProps, JobStatusResponse } from "@/types/responsePage";
 
 /** --- Displays the generated text response with live job polling, copy, and markdown rendering --- **/
-const Response = ({ jobId, onResponseReady, onResponse }: ResponseProps) => {
+const Response = ({
+  jobId,
+  onResponseReady,
+  onResponse,
+  onNote,
+}: ResponseProps) => {
   const [copied, setCopied] = useState(false);
 
   // --- Poll job status until finished using reusable hook ---
@@ -30,9 +35,12 @@ const Response = ({ jobId, onResponseReady, onResponse }: ResponseProps) => {
     if (notifiedKeyRef.current === key) return;
 
     notifiedKeyRef.current = key;
+
+    // Emit response and note upstream
     onResponse(data.result.response, data.result.session_id);
+    onNote?.(data.result.note ?? undefined);
     onResponseReady();
-  }, [status, data, onResponse, onResponseReady]);
+  }, [status, data, onResponse, onResponseReady, onNote]);
 
   // --- Copy response to clipboard ---
   const handleCopy = async () => {

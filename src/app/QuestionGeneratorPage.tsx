@@ -13,6 +13,7 @@ import Header from "@/components/common/Header";
 import { triggerGeneration } from "@/api/generateResponse";
 import { DemographicData, TriggerBody } from "@/types/questionGeneratorPage";
 import DemographicDistributionForm from "@/components/questionGeneratorPage/DemographicDistForm";
+import { buildDefaultPrompt, buildDemographicPrompt } from "@/lib/prompts";
 
 /** --- Validation schema --- **/
 const schema = z.object({
@@ -20,94 +21,6 @@ const schema = z.object({
 });
 
 type QuestionGeneratorFormData = z.infer<typeof schema>;
-
-/** --- Prompt builders --- **/
-// Default prompt (non-demographic)
-const buildDefaultPrompt = (topic: string, count: string, country?: string) =>
-  `
-You are developing a question bank for medical exams focusing on the topic of ${
-    topic || "x"
-  }. 
-Please generate ${
-    count || "y"
-  } high-quality, single-best-answer multiple-choice questions. 
-Follow the principles of constructing multiple-choice items in medical education. 
-Generate the questions using the following framework:
-
-**Case** (write as a single narrative paragraph without separating each part):
-- **Patient details** (gender, age, ethnicity)
-- **Presenting complaint**
-- **Relevant clinical history**
-- **Physical examination findings**
-- **Diagnostic test results** (optional)
-
-**Question Stem**:
-- Integrate relevant details from the case without revealing the answer.
-
-**Acceptable Question Style**:
-- Ask for the **BEST** answer, avoiding **TRUE/FALSE** style questions.
-
-**Answer Options**:
-1. [Insert plausible answer option]
-2. [Insert plausible answer option]
-3. [Insert plausible answer option]
-4. [Insert plausible answer option]
-5. [Insert plausible answer option]
-
-**Explanation**:
-- Clearly identify and explain the correct answer.
-- Justify the correct answer based on **evidence-based guidelines** or **expert consensus**.
-- Briefly explain why the other options are incorrect or less correct.
-
-**Difficulty Level**: Medium
-
-Always mention **ethnicity** in the clinical scenario (case).
-The demographic information in the scenarios should reflect the reality of the population with ${
-    topic || "x"
-  } in ${country || "the target country"}.
-Structure the question so that the clinical scenario is separated with **'XXX'**, following this format:  
-"XXX <clinical scenario - the case> XXX...", so it can be extracted for analysis.`.trim();
-
-// Prompt variant when demographic distribution is enabled
-const buildDemographicPrompt = (topic: string, country?: string) =>
-  `
-You are developing a question bank for medical exams focusing on the topic of ${
-    topic || "x"
-  }. 
-Please generate high-quality, single-best-answer multiple-choice questions.  
-Follow the principles of constructing multiple-choice items in medical education. 
-Generate the questions using the following framework:
-
-**Case** (write as a single narrative paragraph without separating each part):
-- **Patient details** (gender, age, ethnicity)
-- **Presenting complaint**
-- **Relevant clinical history**
-- **Physical examination findings**
-- **Diagnostic test results** (optional)
-
-**Question Stem**:
-- Integrate relevant details from the case without revealing the answer.
-
-**Acceptable Question Style**:
-- Ask for the **BEST** answer, avoiding **TRUE/FALSE** style questions.
-
-**Answer Options**:
-1. [Insert plausible answer option]
-2. [Insert plausible answer option]
-3. [Insert plausible answer option]
-4. [Insert plausible answer option]
-5. [Insert plausible answer option]
-
-**Explanation**:
-- Clearly identify and explain the correct answer.
-- Justify the correct answer based on **evidence-based guidelines** or **expert consensus**.
-- Briefly explain why the other options are incorrect or less correct.
-
-**Difficulty Level**: Medium
-
-Always mention **ethnicity** in the clinical scenario (case).
-Structure the question so that the clinical scenario is separated with **'XXX'**, following this format:   
-"XXX <clinical scenario - the case> XXX...", so it can be extracted for analysis.`.trim();
 
 /** --- Main component --- **/
 const QuestionGeneratorPage = () => {
@@ -128,7 +41,7 @@ const QuestionGeneratorPage = () => {
 
   // Default prompt setup
   const [prompt, setPrompt] = useState<string>(
-    buildDefaultPrompt("x", "y", country)
+    buildDefaultPrompt({ topic: "x", count: "y", country })
   );
 
   const navigate = useNavigate();
@@ -148,8 +61,12 @@ const QuestionGeneratorPage = () => {
     if (isCustomPrompt) return;
 
     const generated = enableDemographicSpec
-      ? buildDemographicPrompt(selectedCondition, country)
-      : buildDefaultPrompt(selectedCondition, numQuestions, country);
+      ? buildDemographicPrompt({ topic: selectedCondition, country })
+      : buildDefaultPrompt({
+          topic: selectedCondition,
+          count: numQuestions,
+          country,
+        });
 
     const trimmed = generated.trim();
     setPrompt(trimmed);
@@ -171,7 +88,7 @@ const QuestionGeneratorPage = () => {
   const { mutate, isPending } = useMutation({
     mutationFn: (body: TriggerBody) => triggerGeneration(body),
     onSuccess: (data) => {
-      // Ensure numQuestions defaults to 1 if blank or invalid
+      // Default to 1 if numQuestions is empty or invalid (for client state)
       const questionsToRequest =
         numQuestions === "" || isNaN(Number(numQuestions))
           ? 1
@@ -181,7 +98,7 @@ const QuestionGeneratorPage = () => {
         state: {
           prompt,
           model: selectedModel,
-          requestedNumQuestions: numQuestions,
+          requestedNumQuestions: questionsToRequest,
           demographicData: enableDemographicSpec ? demographicData : null,
         },
       });
@@ -235,12 +152,16 @@ const QuestionGeneratorPage = () => {
       return;
     }
 
-    const n = Number(numQuestions);
+    // Normalize number of questions: "" or invalid -> 1
+    const parsed = parseInt(numQuestions, 10);
+    const questionsToRequest =
+      Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
 
     const body: TriggerBody = {
       prompt: data.prompt,
       model: selectedModel,
-      ...(Number.isFinite(n) && n > 0 ? { numQuestions: n } : {}),
+      // ALWAYS include a concrete number
+      numQuestions: questionsToRequest,
       ...(enableDemographicSpec ? { demographicData } : {}),
     };
 

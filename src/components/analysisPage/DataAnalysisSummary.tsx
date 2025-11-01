@@ -65,12 +65,18 @@ const DataAnalysisSummary = ({ analyzedData }: DataAnalysisSummaryProps) => {
               ethnicity.includes("latino")
             ) {
               ethnicity = "Hispanic";
+            } else if (
+              ethnicity.includes("white") ||
+              ethnicity.includes("caucasian")
+            ) {
+              ethnicity = "White";
+            } else if (
+              ethnicity.includes("black") ||
+              ethnicity.includes("african")
+            ) {
+              ethnicity = "African American";
             } else if (ethnicity.includes("asian")) {
               ethnicity = "Asian";
-            } else if (ethnicity.includes("white")) {
-              ethnicity = "White";
-            } else if (ethnicity.includes("black")) {
-              ethnicity = "Black";
             }
 
             ethnicity = ethnicity

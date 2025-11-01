@@ -12,13 +12,18 @@ const AnalyzeDropdownButton = ({
   isResponseReady,
   onAnalyze,
   isPending,
+  blockAnalyze,
 }: AnalyzeDropdownButtonProps) => {
+  // Disable button if analysis is pending, response not ready, or note indicates no delimiters
+   const isDisabled: boolean =
+    !isResponseReady || !!isPending || !!blockAnalyze;
+
   // --- UI layout ---
   return (
     <DropdownMenu>
       {/* Main button trigger */}
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" disabled={!isResponseReady || isPending}>
+        <Button variant="outline" disabled={!!isDisabled}>
           {isPending ? "Analyzing..." : "Analyze the text"}
         </Button>
       </DropdownMenuTrigger>
