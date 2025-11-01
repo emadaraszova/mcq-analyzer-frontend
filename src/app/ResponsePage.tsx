@@ -21,6 +21,7 @@ const ResponsePage = () => {
   // --- Local state ---
   const [isResponseReady, setIsResponseReady] = useState(false);
   const [response, setResponse] = useState<string>("");
+  const [note, setNote] = useState<string | undefined>(undefined);
   const [selectedModel, setSelectedModel] = useState<string>("");
 
   // --- API mutation: analyze generated response ---
@@ -69,6 +70,11 @@ const ResponsePage = () => {
     URL.revokeObjectURL(url);
   };
 
+  // Disable analyze when BE reports no delimiters
+  const blockAnalyze = !!note
+    ?.toLowerCase()
+    .includes("no xxx delimiters found");
+
   // --- UI layout ---
   return (
     <div className="flex flex-col mx-auto px-6 py-2 h-full w-[90%] max-w-screen-xl relative">
@@ -76,7 +82,8 @@ const ResponsePage = () => {
       <Response
         jobId={jobId!}
         onResponseReady={() => setIsResponseReady(true)}
-        onResponse={(response) => setResponse(response)}
+        onResponse={(text) => setResponse(text)}
+        onNote={(n) => setNote(n ?? undefined)} // ← capture note from BE
       />
 
       {/* Footer actions */}
@@ -89,10 +96,12 @@ const ResponsePage = () => {
           >
             Download the MCQs
           </Button>
+
           <AnalyzeDropdownButton
             isResponseReady={isResponseReady}
             onAnalyze={handleAnalyzeMCQs}
             isPending={isPending}
+            blockAnalyze={blockAnalyze} // ← force-disable when no delimiters
           />
         </div>
       </div>

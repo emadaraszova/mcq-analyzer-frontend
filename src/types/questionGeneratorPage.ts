@@ -37,6 +37,12 @@ export type PromptEditorProps = {
   setIsCustomPrompt: (custom: boolean) => void;
 };
 
+export type PromptParams = {
+  topic: string;
+  count?: string; // optional for demographic mode
+  country?: string;
+};
+
 // --- Props for the generate button ---
 export type GenerateButtonProps = {
   disabled?: boolean;
