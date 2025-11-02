@@ -30,8 +30,10 @@ const BASE_BLOCK = `
 `.trim();
 
 const DELIM_INSTRUCTION = `
-Structure each question so that the entire clinical case narrative is enclosed at both the beginning and end by the delimiter XXX, using this exact format:
-"XXX <clinical scenario — the case narrative> XXX...", so it can be extracted for analysis.
+**Delimiter Formatting Requirement**:  
+- The entire case narrative must be enclosed at both the beginning and end by the delimiter "XXX" using **exactly this format**:
+XXX <insert case narrative here> XXX
+- After the closing "XXX", continue with the question stem, followed by answer options and explanation.
 `.trim();
 
 export const buildDefaultPrompt = ({ topic, count, country }: PromptParams) =>
@@ -39,9 +41,7 @@ export const buildDefaultPrompt = ({ topic, count, country }: PromptParams) =>
 You are developing a question bank for medical exams focusing on the topic of ${
     topic || "x"
   }.
-Please generate ${
-    count || "y"
-  } high-quality, single-best-answer multiple-choice question(s).
+Please generate high-quality, single-best-answer multiple-choice question(s).
 Follow the principles of constructing multiple-choice items in medical education.
 ${BASE_BLOCK}
 
@@ -49,6 +49,7 @@ Always mention **ethnicity** in the case.
 The demographic information in the case should reflect the reality of the population with ${
     topic || "x"
   } in ${country || "the target country"}.
+
 ${DELIM_INSTRUCTION}
 `.trim();
 
