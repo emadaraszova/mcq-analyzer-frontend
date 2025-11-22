@@ -1,7 +1,7 @@
 import { TriggerBody, TriggerResponse } from "@/types/questionGeneratorPage";
 import { JobStatusResponse } from "@/types/responsePage";
 
-const API_BASE = "http://localhost:8000/api/generate-response";
+const API_BASE = import.meta.env.VITE_API_URL;
 
 /**
  * Ensures a fetch Response is OK; otherwise throws an Error with any server-provided detail.
@@ -43,7 +43,7 @@ export async function triggerGeneration(
 
   let res: Response;
   try {
-    res = await fetch(`${API_BASE}/trigger`, {
+    res = await fetch(`${API_BASE}/api/generate-response/trigger`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -68,7 +68,7 @@ export async function triggerGeneration(
 export async function getJobStatus(jobId: string): Promise<JobStatusResponse> {
   let res: Response;
   try {
-    res = await fetch(`${API_BASE}/status/${jobId}`);
+    res = await fetch(`${API_BASE}/api/generate-response/status/${jobId}`);
   } catch (err) {
     throw new Error(
       `Status request failed to send: ${(err as Error)?.message || String(err)}`
