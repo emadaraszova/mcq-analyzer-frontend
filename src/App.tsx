@@ -3,8 +3,8 @@ import { TooltipProvider } from "@radix-ui/react-tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "react-hot-toast";
 
-import Navbar from "./components/mainPage/navbar";
-import MainPage from "./app/MainPage";
+import Navbar from "./components/homePage/navbar";
+import HomePage from "./app/HomePage";
 import QuestionGeneratorPage from "./app/QuestionGeneratorPage";
 import ResponsePage from "./app/ResponsePage";
 import AnalysisPage from "./app/AnalysisPage";
@@ -27,7 +27,7 @@ const App = () => {
             <main className="mx-auto px-4 py-6">
               {/* --- Route definitions --- */}
               <Routes>
-                <Route path="/" element={<MainPage />} />
+                <Route path="/" element={<HomePage />} />
                 <Route path="/generator" element={<QuestionGeneratorPage />} />
                 <Route path="/chat/:jobId" element={<ResponsePage />} />
                 <Route

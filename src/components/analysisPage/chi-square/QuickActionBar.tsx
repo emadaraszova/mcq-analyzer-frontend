@@ -26,8 +26,8 @@ const QuickActionsBar = ({
       </Button>
 
       {/* Reset all fields */}
-      <Button variant="ghost" onClick={onReset}>
-        Reset
+      <Button variant="secondary" onClick={onReset}>
+        Reset table
       </Button>
     </div>
   );

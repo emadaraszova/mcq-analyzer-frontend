@@ -44,36 +44,45 @@ const AnalyzerPage = () => {
     });
   };
 
-  // --- Handle textarea input ---
+  // --- Handle textarea input (UPDATED) ---
   const handleTextareaChange = (
     event: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
     const value = event.target.value;
     setTextareaValue(value);
-    setIsResponseReady(value.trim().length > 0);
+
+    // Button active ONLY if text contains at least one XXX <text> XXX pair
+    const hasDelimiterPair = /XXX\s*[\s\S]+?\s*XXX/.test(value);
+    setIsResponseReady(hasDelimiterPair);
   };
 
   // --- UI layout ---
   return (
-    <div className="flex flex-col max-w-3xl mx-auto w-full">
-      <Header title={"Analyze Your Text"} />
-      <div className="flex flex-col justify-center">
+    <div className="max-w-3xl mx-auto flex p-8 flex-col items-center">
+      <Header title="Analyze Your Text" />
+      <div className="w-full">
         <Label htmlFor="textareaValue" text="Your text" />
-        <Textarea
-          id="textareaValue"
-          name="textareaValue"
-          autoComplete="off"
-          className="mb-4"
-          placeholder="Paste your text here."
-          value={textareaValue}
-          onChange={handleTextareaChange}
-        />
-        <AnalyzeDropdownButton
-          isResponseReady={isResponseReady}
-          onAnalyze={handleAnalyzeMCQs}
-          isPending={isPending}
-        />
       </div>
+      <Textarea
+        id="textareaValue"
+        name="textareaValue"
+        autoComplete="off"
+        className="mb-4"
+        placeholder="Paste your text here."
+        value={textareaValue}
+        onChange={handleTextareaChange}
+      />
+      <AnalyzeDropdownButton
+        isResponseReady={isResponseReady}
+        onAnalyze={handleAnalyzeMCQs}
+        isPending={isPending}
+      />
+      {/* Disclaimer */}
+      <p className="text-xs sm:text-sm text-amber-900 mt-2 max-w-3xl leading-snug">
+        ⚠️ Please ensure your text includes the required{" "}
+        <strong>XXX ... XXX</strong> delimiters. Without them, the analysis will
+        not be available.
+      </p>
     </div>
   );
 };

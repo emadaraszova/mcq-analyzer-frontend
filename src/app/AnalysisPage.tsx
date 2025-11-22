@@ -11,8 +11,10 @@ import ReactMarkdown from "react-markdown";
 import { getJobStatus } from "@/api/analyzeClinical";
 import { Loader } from "@/components/analysisPage/Loader";
 import { JobStatusResponse } from "@/types/analysisPage";
-import ChiSquareGoFCard from "@/components/analysisPage/chi-square/ChiSquareGoFCard";
 import { useJobStatus } from "@/hook/useJobStatus";
+import ChiSquareCalculatorCard from "@/components/analysisPage/chi-square/ChiSquareCalculatorCard";
+import ChiSquareGoF from "@/components/analysisPage/chi-square/ChiSquareGoF";
+import ChiSquareHomogeneity from "@/components/analysisPage/chi-square/ChiSquareHomogeneity";
 
 /** --- Analysis Page --- **/
 const AnalysisPage = () => {
@@ -140,8 +142,22 @@ const AnalysisPage = () => {
           </div>
         </div>
 
-        {/* Chi-Square Goodness-of-Fit calculator */}
-        <ChiSquareGoFCard />
+        {/* Chi-Square calculators */}
+        <div className="space-y-4">
+          <ChiSquareCalculatorCard
+            title="Chi-Square Goodness-of-Fit"
+            subtitle="Compare observed counts to expected counts or probabilities."
+          >
+            <ChiSquareGoF />
+          </ChiSquareCalculatorCard>
+
+          <ChiSquareCalculatorCard
+            title="Chi-Square Test of Homogeneity"
+            subtitle="Compare category distributions across two or more groups."
+          >
+            <ChiSquareHomogeneity />
+          </ChiSquareCalculatorCard>
+        </div>
       </div>
     );
   }

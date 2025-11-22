@@ -21,25 +21,36 @@ const AgeHistogram = ({ ageData }: AgeHistogramProps) => {
     );
   }
 
-  // --- Build histogram bins ---
+  // --- Build histogram bins (aligned, single set) ---
+  const binSize = 5;
   const minAge = Math.min(...ageData);
   const maxAge = Math.max(...ageData);
-  const binSize = 5;
-  const bins: Record<string, number> = {};
 
-  for (let i = minAge; i <= maxAge; i += binSize) {
-    bins[`${i}-${i + binSize - 1}`] = 0;
+  // Align to bin boundaries
+  const start = Math.floor(minAge / binSize) * binSize; // inclusive
+  const endExclusive = Math.ceil((maxAge + 1) / binSize) * binSize; // exclusive upper bound
+
+  // Pre-build bins and ordered starts
+  const bins: Record<string, number> = {};
+  const starts: number[] = [];
+  for (let s = start; s < endExclusive; s += binSize) {
+    starts.push(s);
+    bins[`${s}-${s + binSize - 1}`] = 0;
   }
 
+  // Count ages without creating new keys
   ageData.forEach((age) => {
-    const start = Math.floor(age / binSize) * binSize;
-    const binKey = `${start}-${start + binSize - 1}`;
-    bins[binKey] = (bins[binKey] || 0) + 1;
+    const idx = Math.floor(((age - start) * 1.0) / binSize);
+    const clampedIdx = Math.max(0, Math.min(idx, starts.length - 1));
+    const s = starts[clampedIdx];
+    const key = `${s}-${s + binSize - 1}`;
+    bins[key] += 1;
   });
 
-  const histogramData = Object.entries(bins).map(([range, count]) => ({
-    range,
-    count,
+  // Build chart data in correct order
+  const histogramData = starts.map((s) => ({
+    range: `${s}-${s + binSize - 1}`,
+    count: bins[`${s}-${s + binSize - 1}`],
   }));
 
   // --- Copy chart as image ---
@@ -96,6 +107,7 @@ const AgeHistogram = ({ ageData }: AgeHistogramProps) => {
           >
             <XAxis
               dataKey="range"
+              interval={0} // show every tick; remove if crowded
               label={{
                 value: "Age Range",
                 position: "insideBottom",
