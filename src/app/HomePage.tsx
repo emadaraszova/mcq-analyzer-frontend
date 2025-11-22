@@ -1,10 +1,10 @@
-import CardMain from "@/components/mainPage/CardMain";
+import CardMain from "@/components/homePage/CardMain";
 
 /**
  * Main landing page component displaying an overview of the tool
  * and navigation cards for the generator and analyzer features.
  */
-const MainPage = () => {
+const HomePage = () => {
   return (
     <div className="flex flex-col items-center px-6 py-4 space-y-10 mx-auto">
       {/* About Section */}
@@ -82,4 +82,4 @@ const MainPage = () => {
   );
 };
 
-export default MainPage;
+export default HomePage;

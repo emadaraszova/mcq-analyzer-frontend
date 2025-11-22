@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ArrowRight } from "lucide-react";
-import { CardProps } from "@/types/mainPage";
+import { CardProps } from "@/types/homePage";
 import { useNavigate } from "react-router-dom";
 
 /** --- Displays a feature card with title, description, and navigation button --- **/

@@ -15,19 +15,17 @@ const AnalyzeDropdownButton = ({
   blockAnalyze,
 }: AnalyzeDropdownButtonProps) => {
   // Disable button if analysis is pending, response not ready, or note indicates no delimiters
-   const isDisabled: boolean =
-    !isResponseReady || !!isPending || !!blockAnalyze;
+  const isDisabled: boolean = !isResponseReady || !!isPending || !!blockAnalyze;
 
   // --- UI layout ---
   return (
     <DropdownMenu>
       {/* Main button trigger */}
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" disabled={!!isDisabled}>
+        <Button variant="outline" disabled={!!isDisabled} className="w-full">
           {isPending ? "Analyzing..." : "Analyze the text"}
         </Button>
       </DropdownMenuTrigger>
-
       {/* Dropdown content: model options */}
       <DropdownMenuContent>
         <DropdownMenuItem onClick={() => onAnalyze("gemini-2.5-flash")}>
@@ -36,14 +34,12 @@ const AnalyzeDropdownButton = ({
             Free
           </span>
         </DropdownMenuItem>
-
         <DropdownMenuItem onClick={() => onAnalyze("llama3.3:latest")}>
           <span>Analyze with llama3.3</span>
           <span className="ml-2 text-xs px-2 py-1 rounded bg-green-200 text-green-800">
             Free
           </span>
         </DropdownMenuItem>
-
         <DropdownMenuItem onClick={() => onAnalyze("gpt-4o")}>
           <span>Analyze with gpt-4o</span>
           <span className="ml-2 text-xs px-2 py-1 rounded bg-red-200 text-red-800">

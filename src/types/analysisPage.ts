@@ -89,3 +89,39 @@ export type ResultSummaryProps = {
   onAlphaChange: (a: number) => void;
   enabled: boolean;
 };
+
+// --- Homogeneity table row ---
+export type HomogeneityRow = {
+  rowLabel: string;
+  values: (string | number)[];
+};
+
+// --- Homogeneity data entry props ---
+export interface HomogeneityDataEntryTableProps {
+  rows: HomogeneityRow[];
+  columnLabels: string[];
+  onChangeRowLabel: (rowIndex: number, label: string) => void;
+  onChangeCell: (
+    rowIndex: number,
+    colIndex: number,
+    value: string | number
+  ) => void;
+  onChangeColumnLabel: (colIndex: number, label: string) => void;
+  onAddRow: () => void;
+  onRemoveRow: (rowIndex: number) => void;
+  onAddColumn: () => void;
+  onRemoveColumn: (colIndex: number) => void;
+}
+
+// --- Ethnicity configuration types ---
+export type EthnicityCategoryConfig = {
+  id: string;
+  label: string;
+  matchers: string[];
+  isFallback?: boolean;
+};
+
+export type EthnicityConfigCardProps = {
+  config: EthnicityCategoryConfig[];
+  onChange: (next: EthnicityCategoryConfig[]) => void;
+};

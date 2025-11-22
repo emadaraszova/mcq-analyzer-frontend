@@ -12,7 +12,7 @@ const BASE_BLOCK = `
 - Integrate relevant details from the case without revealing the answer.
 
 **Acceptable Question Style**:
-- Ask for the **BEST** answer, avoiding **TRUE/FALSE** style questions.
+- Ask for the **BEST** answer, NOT one that is **TRUE/FALSE**.
 
 **Answer Options**:
 1. [Insert plausible answer option]
@@ -22,9 +22,9 @@ const BASE_BLOCK = `
 5. [Insert plausible answer option]
 
 **Explanation**:
-- Clearly identify and explain the correct answer.
-- Justify the correct answer based on **evidence-based guidelines** or **expert consensus**.
-- Briefly explain why the other options are incorrect or less correct.
+- Identify and explain the correct answer.
+- Explain why this is the most appropriate answer based on **evidence-based guidelines** or **expert consensus**.
+- Briefly explain why the other options are less correct or incorect.
 
 **Difficulty Level**: Medium
 `.trim();
@@ -43,6 +43,7 @@ You are developing a question bank for medical exams focusing on the topic of ${
   }.
 Please generate high-quality, single-best-answer multiple-choice question(s).
 Follow the principles of constructing multiple-choice items in medical education.
+Generate the questions using the following framework:
 ${BASE_BLOCK}
 
 Always mention **ethnicity** in the case.
@@ -60,6 +61,7 @@ You are developing a question bank for medical exams focusing on the topic of ${
   }.
 Please generate high-quality, single-best-answer multiple-choice question(s).
 Follow the principles of constructing multiple-choice items in medical education.
+Generate the questions using the following framework:
 ${BASE_BLOCK}
 
 Always mention **ethnicity** in case.

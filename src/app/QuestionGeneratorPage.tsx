@@ -160,7 +160,6 @@ const QuestionGeneratorPage = () => {
     const body: TriggerBody = {
       prompt: data.prompt,
       model: selectedModel,
-      // ALWAYS include a concrete number
       numQuestions: questionsToRequest,
       ...(enableDemographicSpec ? { demographicData } : {}),
     };
