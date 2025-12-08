@@ -1,6 +1,6 @@
 // --- Analysis result structures from backend ---
 export type ClinicalAnalysisItem = {
-  gender: string | null;
+  sex: string | null;
   ethnicity: string | null;
   age: number | null | string;
 };
@@ -12,6 +12,8 @@ export type ClinicalAnalysisResult = {
 // --- Props for analysis-related components ---
 export type DataAnalysisSummaryProps = {
   analyzedData: ClinicalAnalysisResult;
+  ethnicityConfig: EthnicityCategoryConfig[];
+  onEthnicityConfigChange: (config: EthnicityCategoryConfig[]) => void;
 };
 
 export type PieChartComponentProps = {
@@ -124,4 +126,20 @@ export type EthnicityCategoryConfig = {
 export type EthnicityConfigCardProps = {
   config: EthnicityCategoryConfig[];
   onChange: (next: EthnicityCategoryConfig[]) => void;
+};
+
+// Shape of one normalized row used for table
+export type NormalizedRow = {
+  index: number; // 1-based index of the question
+  rawSex: string | null; // original value as extracted (e.g. "male")
+  normalizedSex: "Male" | "Female" | null; // mapped value used in analysis
+  rawEthnicity: string | null; // original ethnicity string
+  ethnicityCategory: string | null; // mapped category label (e.g. "Black", "Hispanic")
+  age: number | null; // numeric age (if parsable)
+};
+
+// Props for the normalized questions table
+export type QuestionsTableProps = {
+  questions: ClinicalAnalysisItem[];
+  ethnicityConfig: EthnicityCategoryConfig[];
 };

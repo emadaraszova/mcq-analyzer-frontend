@@ -122,7 +122,7 @@ const QuestionGeneratorPage = () => {
     );
 
     if (filledCategories.length !== 1) {
-      return "Please fill exactly one category (Gender OR Ethnicity OR Age).";
+      return "Please fill exactly one category (Sex OR Ethnicity OR Age).";
     }
 
     const rows = demographicData[filledCategories[0]];

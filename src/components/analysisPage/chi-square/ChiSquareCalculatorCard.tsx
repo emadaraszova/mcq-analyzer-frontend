@@ -21,7 +21,7 @@ const ChiSquareCalculatorCard = ({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-xl font-semibold">{title}</h3>
+          <h3 className="text-lg font-semibold">{title}</h3>
           <p className="text-sm text-slate-600">{subtitle}</p>
         </div>
 
