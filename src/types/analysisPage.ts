@@ -14,6 +14,8 @@ export type DataAnalysisSummaryProps = {
   analyzedData: ClinicalAnalysisResult;
   ethnicityConfig: EthnicityCategoryConfig[];
   onEthnicityConfigChange: (config: EthnicityCategoryConfig[]) => void;
+  onSexDistributionChange?: (data: DistributionPoint[]) => void;
+  onEthnicityDistributionChange?: (data: DistributionPoint[]) => void;
 };
 
 export type PieChartComponentProps = {
@@ -59,6 +61,11 @@ export type Row = {
   label: string;
   observed: number | "";
   expected: number | "";
+};
+
+export type ChiSquareGoFProps = {
+  sexObservedFromCharts?: DistributionPoint[];
+  ethnicityObservedFromCharts?: DistributionPoint[];
 };
 
 export type DataEntryTableProps = {
@@ -130,16 +137,21 @@ export type EthnicityConfigCardProps = {
 
 // Shape of one normalized row used for table
 export type NormalizedRow = {
-  index: number; // 1-based index of the question
-  rawSex: string | null; // original value as extracted (e.g. "male")
-  normalizedSex: "Male" | "Female" | null; // mapped value used in analysis
-  rawEthnicity: string | null; // original ethnicity string
-  ethnicityCategory: string | null; // mapped category label (e.g. "Black", "Hispanic")
-  age: number | null; // numeric age (if parsable)
+  index: number;
+  rawSex: string | null;
+  normalizedSex: "Male" | "Female" | null;
+  rawEthnicity: string | null;
+  ethnicityCategory: string | null;
+  age: number | null;
 };
 
 // Props for the normalized questions table
 export type QuestionsTableProps = {
   questions: ClinicalAnalysisItem[];
   ethnicityConfig: EthnicityCategoryConfig[];
+};
+
+export type DistributionPoint = {
+  name: string; // label used in charts
+  value: number; // count
 };

@@ -13,6 +13,7 @@ import { Loader } from "@/components/analysisPage/Loader";
 import {
   JobStatusResponse,
   EthnicityCategoryConfig,
+  DistributionPoint,
 } from "@/types/analysisPage";
 import { useJobStatus } from "@/hook/useJobStatus";
 import ChiSquareCalculatorCard from "@/components/analysisPage/chi-square/ChiSquareCalculatorCard";
@@ -36,6 +37,14 @@ const AnalysisPage = () => {
   const [ethnicityConfig, setEthnicityConfig] = useState<
     EthnicityCategoryConfig[]
   >(defaultEthnicityConfig);
+
+  // Sex & ethnicity distributions from charts (for Chi-Square GoF)
+  const [sexDistribution, setSexDistribution] = useState<DistributionPoint[]>(
+    []
+  );
+  const [ethnicityDistribution, setEthnicityDistribution] = useState<
+    DistributionPoint[]
+  >([]);
 
   // --- Fetch job status via reusable hook ---
   const { data, isLoading, isError, error } = useJobStatus<JobStatusResponse>(
@@ -84,11 +93,14 @@ const AnalysisPage = () => {
         <h2 className="text-center font-semibold text-lg text-sky-700">
           Analysis done using {model}
         </h2>
+
         {/* Summary of analyzed data (charts + stats) */}
         <DataAnalysisSummary
           analyzedData={result}
           ethnicityConfig={ethnicityConfig}
           onEthnicityConfigChange={setEthnicityConfig}
+          onSexDistributionChange={setSexDistribution}
+          onEthnicityDistributionChange={setEthnicityDistribution}
         />
 
         {/* Accordions: show extracted data + original response */}
@@ -150,7 +162,10 @@ const AnalysisPage = () => {
             title="Chi-Square Goodness-of-Fit"
             subtitle="Compare observed counts to expected counts or probabilities."
           >
-            <ChiSquareGoF />
+            <ChiSquareGoF
+              sexObservedFromCharts={sexDistribution}
+              ethnicityObservedFromCharts={ethnicityDistribution}
+            />
           </ChiSquareCalculatorCard>
 
           <ChiSquareCalculatorCard

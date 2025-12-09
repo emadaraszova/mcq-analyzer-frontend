@@ -5,7 +5,7 @@ import {
 import PieChartComponent from "./PieChart";
 import AgeHistogram from "./AgeHistogram";
 import EthnicityConfigCard from "./EthnicityConfigCard";
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import {
   normalizeSex,
   resolveEthnicityCategory,
@@ -16,6 +16,8 @@ const DataAnalysisSummary = ({
   analyzedData,
   ethnicityConfig,
   onEthnicityConfigChange,
+  onSexDistributionChange,
+  onEthnicityDistributionChange,
 }: DataAnalysisSummaryProps) => {
   // --- Compute summary statistics (depends on ethnicityConfig) ---
   const { summary, sexData, ethnicityData, ageData } = useMemo(() => {
@@ -27,8 +29,8 @@ const DataAnalysisSummary = ({
       console.warn("No analyzed data provided or questions array is invalid.");
       return {
         summary: {},
-        sexData: [],
-        ethnicityData: [],
+        sexData: [] as { name: string; value: number }[],
+        ethnicityData: [] as { name: string; value: number }[],
         ageData: [] as number[],
       };
     }
@@ -132,6 +134,19 @@ const DataAnalysisSummary = ({
 
     return { summary, sexData, ethnicityData, ageData: ageValues };
   }, [analyzedData, ethnicityConfig]);
+
+  // --- Push distributions up to parent for Chi-Square calculator ---
+  useEffect(() => {
+    if (onSexDistributionChange) {
+      onSexDistributionChange(sexData);
+    }
+  }, [sexData, onSexDistributionChange]);
+
+  useEffect(() => {
+    if (onEthnicityDistributionChange) {
+      onEthnicityDistributionChange(ethnicityData);
+    }
+  }, [ethnicityData, onEthnicityDistributionChange]);
 
   // --- Render analysis summary + charts ---
   return (

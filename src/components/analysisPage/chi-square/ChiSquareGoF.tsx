@@ -1,11 +1,18 @@
 import { useMemo, useState } from "react";
 import { computeChiSquare } from "@/hook/useChiSquare";
-import { EntryMode, Issue, Row } from "@/types/analysisPage";
+import {
+  EntryMode,
+  Issue,
+  Row,
+  ChiSquareGoFProps,
+  DistributionPoint,
+} from "@/types/analysisPage";
 import EntryModeSelector from "./EntryModeSelector";
 import DataEntryTable from "./DataEntryTable";
 import ValidationMessages from "./ValidationMessage";
 import QuickActionsBar from "./QuickActionBar";
 import ResultSummary from "./ResultSummary";
+import { Button } from "@/components/ui/button";
 
 /** --- Initial empty dataset --- **/
 const emptyRows: Row[] = [
@@ -14,11 +21,27 @@ const emptyRows: Row[] = [
 ];
 
 /** --- Chi-Square Goodness-of-Fit main component --- **/
-const ChiSquareGoF = () => {
+const ChiSquareGoF = ({
+  sexObservedFromCharts,
+  ethnicityObservedFromCharts,
+}: ChiSquareGoFProps) => {
   // --- Local state ---
   const [entryMode, setEntryMode] = useState<EntryMode>("expected-freq");
   const [rows, setRows] = useState<Row[]>(emptyRows);
   const [alpha, setAlpha] = useState<number>(0.05);
+
+  // --- Helper: fill observed from chart data ---
+  const fillObservedFrom = (data?: DistributionPoint[]) => {
+    if (!data || data.length === 0) return;
+
+    setRows(
+      data.map((d, idx) => ({
+        label: d.name || `Category ${idx + 1}`,
+        observed: d.value, // number; DataEntryTable will stringify it
+        expected: "",
+      }))
+    );
+  };
 
   // --- Table row helpers ---
   const addRow = () =>
@@ -185,6 +208,30 @@ const ChiSquareGoF = () => {
   return (
     <div className="space-y-4">
       <EntryModeSelector value={entryMode} onChange={setEntryMode} />
+
+      {(sexObservedFromCharts?.length ||
+        ethnicityObservedFromCharts?.length) && (
+        <div className="flex flex-wrap items-center gap-2 text-sm text-slate-600">
+          <span>Fill observed counts from:</span>
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={!sexObservedFromCharts?.length}
+            onClick={() => fillObservedFrom(sexObservedFromCharts)}
+          >
+            Sex distribution
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={!ethnicityObservedFromCharts?.length}
+            onClick={() => fillObservedFrom(ethnicityObservedFromCharts)}
+          >
+            Ethnicity distribution
+          </Button>
+        </div>
+      )}
+
       <DataEntryTable
         rows={rows}
         entryMode={entryMode}
