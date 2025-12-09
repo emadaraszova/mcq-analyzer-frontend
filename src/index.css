@@ -61,10 +61,10 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-mono;
+    @apply bg-background text-foreground font-serif;
   }
 }
 
 html {
-  font-size: 80%;
+  font-size: 95%;
 }

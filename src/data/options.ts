@@ -2,6 +2,7 @@ export const conditionOptions = [
   { value: "osteoporosis", label: "Osteoporosis" },
   { value: "sickle cell disease", label: "Sickle cell disease" },
   { value: "type 1 diabetes", label: "Type 1 diabetes" },
+  { value: "psychosis", label: "Psychosis" },
 ];
 
 export const modelOptions = [

@@ -2,7 +2,7 @@ import { PromptParams } from "@/types/questionGeneratorPage";
 
 const BASE_BLOCK = `
 **Case** (write as a single narrative paragraph without separating each part):
-- **Patient details** (gender, age, ethnicity)
+- **Patient details** (sex, age, ethnicity)
 - **Presenting complaint**
 - **Relevant clinical history**
 - **Physical examination findings**
@@ -24,7 +24,7 @@ const BASE_BLOCK = `
 **Explanation**:
 - Identify and explain the correct answer.
 - Explain why this is the most appropriate answer based on **evidence-based guidelines** or **expert consensus**.
-- Briefly explain why the other options are less correct or incorect.
+- Briefly explain why the other options are less correct or incorrect.
 
 **Difficulty Level**: Medium
 `.trim();

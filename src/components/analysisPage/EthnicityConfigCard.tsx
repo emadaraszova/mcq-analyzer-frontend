@@ -84,7 +84,7 @@ const EthnicityConfigCard = ({
       {/* Header with title and toggle button */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-xl font-semibold">Ethnicity Categories</h3>
+          <h3 className="text-lg font-semibold">Ethnicity Categories</h3>
           <p className="text-sm text-slate-600">
             Define how raw ethnicity strings (e.g. "African American") are
             mapped to chart categories.

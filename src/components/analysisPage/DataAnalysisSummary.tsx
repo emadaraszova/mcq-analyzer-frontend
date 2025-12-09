@@ -1,22 +1,26 @@
 import {
   ClinicalAnalysisItem,
   DataAnalysisSummaryProps,
-  EthnicityCategoryConfig,
 } from "@/types/analysisPage";
 import PieChartComponent from "./PieChart";
 import AgeHistogram from "./AgeHistogram";
 import EthnicityConfigCard from "./EthnicityConfigCard";
-import { useMemo, useState } from "react";
-import { defaultEthnicityConfig } from "@/data/ethnicityDefaults";
+import { useMemo, useEffect } from "react";
+import {
+  normalizeSex,
+  resolveEthnicityCategory,
+} from "@/utils/clinicalNormalization";
 
 /** --- Displays summarized analysis data with charts --- **/
-const DataAnalysisSummary = ({ analyzedData }: DataAnalysisSummaryProps) => {
-  const [ethnicityConfig, setEthnicityConfig] = useState<
-    EthnicityCategoryConfig[]
-  >(defaultEthnicityConfig);
-
+const DataAnalysisSummary = ({
+  analyzedData,
+  ethnicityConfig,
+  onEthnicityConfigChange,
+  onSexDistributionChange,
+  onEthnicityDistributionChange,
+}: DataAnalysisSummaryProps) => {
   // --- Compute summary statistics (depends on ethnicityConfig) ---
-  const { summary, genderData, ethnicityData, ageData } = useMemo(() => {
+  const { summary, sexData, ethnicityData, ageData } = useMemo(() => {
     if (
       !analyzedData ||
       !Array.isArray(analyzedData.questions) ||
@@ -25,8 +29,8 @@ const DataAnalysisSummary = ({ analyzedData }: DataAnalysisSummaryProps) => {
       console.warn("No analyzed data provided or questions array is invalid.");
       return {
         summary: {},
-        genderData: [],
-        ethnicityData: [],
+        sexData: [] as { name: string; value: number }[],
+        ethnicityData: [] as { name: string; value: number }[],
         ageData: [] as number[],
       };
     }
@@ -40,82 +44,41 @@ const DataAnalysisSummary = ({ analyzedData }: DataAnalysisSummaryProps) => {
       string,
       string | { total: string; breakdown: string }
     > = {};
-    const genderData: { name: string; value: number }[] = [];
+    const sexData: { name: string; value: number }[] = [];
     const ethnicityCounts: Record<string, number> = {};
     const ageValues: number[] = [];
 
-    // Helper: find category label for raw ethnicity
-    const resolveEthnicityCategory = (raw: string): string => {
-      const normalized = raw.replace(/-/g, " ").trim().toLowerCase();
-
-      if (!normalized || normalized === "null" || normalized === "unknown") {
-        return "";
-      }
-
-      // Try to match any configured keyword as substring
-      for (const cat of ethnicityConfig) {
-        const matchers = cat.matchers
-          .map((m) => m.toLowerCase().trim())
-          .filter(Boolean);
-        if (matchers.length === 0) continue;
-
-        if (matchers.some((m) => normalized.includes(m))) {
-          return cat.label || "Other";
-        }
-      }
-
-      // Fallback to the category marked as isFallback, if present
-      const fallbackCat = ethnicityConfig.find((c) => c.isFallback);
-      return fallbackCat ? fallbackCat.label : "Other";
-    };
-
     // --- Process each key in question data ---
     keys.forEach((key) => {
-      if (key === "gender") {
-        const genderCounts = analyzedData.questions.reduce(
+      if (key === "sex") {
+        const sexCounts = analyzedData.questions.reduce(
           (counts, item) => {
-            const gender = item[key]?.trim().toLowerCase();
-
-            if (gender && gender !== "null" && gender !== "unknown") {
-              if (
-                ["male", "boy", "man", "trans man", "transgender man"].includes(
-                  gender
-                )
-              )
-                counts.male += 1;
-              else if (
-                [
-                  "female",
-                  "girl",
-                  "woman",
-                  "trans woman",
-                  "transgender woman",
-                ].includes(gender)
-              )
-                counts.female += 1;
-            }
-
+            const normalized = normalizeSex(item[key] ?? null);
+            if (normalized === "Male") counts.male += 1;
+            else if (normalized === "Female") counts.female += 1;
             return counts;
           },
           { male: 0, female: 0 }
         );
 
-        genderData.push(
-          { name: "Male", value: genderCounts.male },
-          { name: "Female", value: genderCounts.female }
+        sexData.push(
+          { name: "Male", value: sexCounts.male },
+          { name: "Female", value: sexCounts.female }
         );
 
         summary[key] = {
-          total: `${genderCounts.male + genderCounts.female}/${totalQuestions}`,
-          breakdown: `Male: ${genderCounts.male}, Female: ${genderCounts.female}`,
+          total: `${sexCounts.male + sexCounts.female}/${totalQuestions}`,
+          breakdown: `Male: ${sexCounts.male}, Female: ${sexCounts.female}`,
         };
       } else if (key === "ethnicity") {
         analyzedData.questions.forEach((item) => {
           const rawEth = item[key];
           if (!rawEth) return;
 
-          const ethString = String(rawEth);
-          const categoryLabel = resolveEthnicityCategory(ethString);
+          const categoryLabel = resolveEthnicityCategory(
+            String(rawEth),
+            ethnicityConfig
+          );
           if (!categoryLabel) return;
 
           ethnicityCounts[categoryLabel] =
@@ -137,7 +100,7 @@ const DataAnalysisSummary = ({ analyzedData }: DataAnalysisSummaryProps) => {
             age !== "null" &&
             age !== "unknown"
           ) {
-            ageValues.push(parseInt(age));
+            ageValues.push(parseInt(age as any, 10));
           } else if (typeof age === "number") {
             ageValues.push(age);
           }
@@ -164,14 +127,26 @@ const DataAnalysisSummary = ({ analyzedData }: DataAnalysisSummaryProps) => {
       }
     });
 
-    // --- Ethnicity pie data based on configured categories ---
     const ethnicityData = ethnicityConfig.map((cat) => ({
       name: cat.label,
       value: ethnicityCounts[cat.label] || 0,
     }));
 
-    return { summary, genderData, ethnicityData, ageData: ageValues };
+    return { summary, sexData, ethnicityData, ageData: ageValues };
   }, [analyzedData, ethnicityConfig]);
+
+  // --- Push distributions up to parent for Chi-Square calculator ---
+  useEffect(() => {
+    if (onSexDistributionChange) {
+      onSexDistributionChange(sexData);
+    }
+  }, [sexData, onSexDistributionChange]);
+
+  useEffect(() => {
+    if (onEthnicityDistributionChange) {
+      onEthnicityDistributionChange(ethnicityData);
+    }
+  }, [ethnicityData, onEthnicityDistributionChange]);
 
   // --- Render analysis summary + charts ---
   return (
@@ -182,17 +157,17 @@ const DataAnalysisSummary = ({ analyzedData }: DataAnalysisSummaryProps) => {
         </div>
       ) : (
         <>
+          {/* Ethnicity categories config – now controlled by parent */}
           <EthnicityConfigCard
             config={ethnicityConfig}
-            onChange={setEthnicityConfig}
+            onChange={onEthnicityConfigChange}
           />
 
-          <div className="grid grid-cols-1 gap-4">
-            {/* Summary cards */}
+          <div className="grid grid-cols-1 gap-2">
             {Object.entries(summary).map(([key, value]) => (
               <div
                 key={key}
-                className="flex flex-col bg-slate-50 p-4 rounded-lg shadow-sm border border-slate-200"
+                className="flex flex-col bg-slate-50 p-3 rounded-lg shadow-sm border border-slate-200"
               >
                 <div className="flex justify-between items-center">
                   <span className="text-slate-600 font-bold">{key}:</span>
@@ -208,12 +183,8 @@ const DataAnalysisSummary = ({ analyzedData }: DataAnalysisSummaryProps) => {
               </div>
             ))}
 
-            {/* Charts */}
             <div className="grid grid-cols-2 gap-4">
-              <PieChartComponent
-                title="Gender Distribution"
-                data={genderData}
-              />
+              <PieChartComponent title="Sex Distribution" data={sexData} />
               <PieChartComponent
                 title="Ethnicity Distribution"
                 data={ethnicityData}

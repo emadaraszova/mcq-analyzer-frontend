@@ -6,7 +6,7 @@ import CardMain from "@/components/homePage/CardMain";
  */
 const HomePage = () => {
   return (
-    <div className="flex flex-col items-center px-6 py-4 space-y-10 mx-auto">
+    <div className="flex flex-col items-center px-6 py-10 space-y-10 mx-auto">
       {/* About Section */}
       <section className="bg-blue-50 p-6 rounded-3xl shadow hover:border-sky-700 transition-colors duration-300 border max-w-5xl overflow-y-auto hover:bg-white max-h-[45vh]">
         {/* Page Title */}
@@ -17,48 +17,51 @@ const HomePage = () => {
         </div>
 
         <h2 className="text-2xl font-semibold mb-2">About this Tool</h2>
-
         <p className="text-slate-700 leading-relaxed">
           <span className="block mb-3">
-            This application helps educators to generate and analyze
+            This application helps educators generate and analyze
             multiple-choice questions using large language models (LLMs). The
-            goal of the analysis is to examine potential{" "}
-            <strong>biases in LLMs</strong>.
+            goal is to examine potential{" "}
+            <strong>biases in LLM-generated clinical scenarios</strong>.
           </span>
 
           <span className="block mb-3">
             Specifically, the tool focuses on detecting and quantifying patterns
             of
-            <strong> demographic (mis)representation</strong> within the
-            clinical scenarios embedded in generated questions. These aspects
-            can reveal subtle forms of bias in training data and model
-            reasoning.
+            <strong> demographic misrepresentation</strong> within the clinical
+            scenarios embedded in generated questions.
           </span>
 
           <span className="block mb-3">
             Understanding and addressing these biases is essential for ensuring
             that AI-generated educational materials are{" "}
-            <strong>fair and reflective of real-world diversity</strong>.
-            Certain conditions are more prevalent or present differently among
-            specific demographic groups. If educational content fails to reflect
-            this reality, students may develop a
-            <strong> narrow or biased clinical perspective</strong>.
+            <strong>
+              fair and reflective of real-world population patterns
+            </strong>
+            . Clinical training materials that fail to reflect real-world
+            demographic diversity can reinforce stereotypes, contribute to
+            diagnostic errors, and leave trainees insufficiently prepared to
+            deliver equitable care.
           </span>
 
           <span className="block mb-3">
-            To support quantitative evaluation, the application includes a
-            <strong> Chi-square goodness-of-fit calculator</strong> that allows
-            users to statistically assess differences between the{" "}
-            <strong>demographic distribution in generated questions</strong> and
-            the <strong>expected distribution based on real-world data</strong>.
-            This helps identify significant deviations that may indicate bias in
-            model outputs.
+            To support quantitative evaluation, the application includes a{" "}
+            <strong>
+              chi-square calculator (goodness-of-fit and test of homogeneity)
+            </strong>{" "}
+            that allows users to compare the{" "}
+            <strong>demographic distribution in generated questions</strong>{" "}
+            with the{" "}
+            <strong>expected distribution based on real-world data</strong>.
+            These results should be interpreted <strong>descriptively</strong>,
+            as indicators of distributional deviation rather than strict
+            inferential statistical tests.
           </span>
 
           <span className="block text-slate-600 italic">
             Note: This tool does not evaluate other qualities of the generated
             questions, such as accuracy, clarity, or clinical validity.
-            AI-generated content can be <strong>incomplete or incorrect</strong>
+            AI-generated content may be <strong>incomplete or incorrect</strong>
             , and all educational materials should be carefully reviewed by
             qualified professionals before use.
           </span>
@@ -74,7 +77,7 @@ const HomePage = () => {
         />
         <CardMain
           title="Analyzer"
-          description="Analyze text for demographic attributes such as gender, ethnicity, and age."
+          description="Analyze text for demographic attributes such as sex, ethnicity, and age."
           redirectTo="/analyzer"
         />
       </div>
