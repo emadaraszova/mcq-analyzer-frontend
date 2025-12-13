@@ -50,17 +50,14 @@ export type TriggerBody = {
 };
 
 // --- Chi-Square Goodness-of-Fit related types ---
-export type EntryMode = "expected-freq" | "expected-prob";
-
-export type EntryModeSelectorProps = {
-  value: EntryMode;
-  onChange: (mode: EntryMode) => void;
-};
-
+/**
+ * GoF input is now frequencies-only, so "entry mode" was removed
+ * (and the EntryModeSelector component was deleted).
+ */
 export type Row = {
   label: string;
-  observed: number | "";
-  expected: number | "";
+  observed: string | number;
+  expected: string | number;
 };
 
 export type ChiSquareGoFProps = {
@@ -70,7 +67,6 @@ export type ChiSquareGoFProps = {
 
 export type DataEntryTableProps = {
   rows: Row[];
-  entryMode: EntryMode;
   onAddRow: () => void;
   onRemoveRow: (index: number) => void;
   onChangeRow: (index: number, patch: Partial<Row>) => void;
@@ -78,9 +74,7 @@ export type DataEntryTableProps = {
 
 export type QuickActionsBarProps = {
   onEqualExpectation: () => void;
-  onNormalizeProbabilities: () => void;
   onReset: () => void;
-  entryMode: EntryMode;
 };
 
 export type Issue = { type: "error" | "warn"; text: string };
@@ -97,6 +91,11 @@ export type ResultSummaryProps = {
   alpha: number;
   onAlphaChange: (a: number) => void;
   enabled: boolean;
+  effectSizes?: {
+    cohensW?: number | null;
+    cramerV?: number | null;
+    tvd?: number | null;
+  } | null;
 };
 
 // --- Homogeneity table row ---

@@ -97,56 +97,48 @@ const ChiSquareHomogeneity = () => {
     const rowCount = rows.length;
     const colCount = columnLabels.length;
 
-    if (rowCount < 2) {
-      issues.push({
-        type: "error",
-        text: "Provide at least two groups (rows).",
-      });
-    }
-
-    if (colCount < 2) {
-      issues.push({
-        type: "error",
-        text: "Provide at least two categories (columns).",
-      });
-    }
-
-    // Build numeric observed table
     const numericTable: number[][] = rows.map((row) =>
       columnLabels.map((_, j) => {
-        const raw = row.values[j];
-        if (raw === "" || raw === undefined || raw === null) return NaN;
-        const n = Number(raw);
-        return Number.isNaN(n) ? NaN : n;
+        const v = row.values[j];
+        if (v === "" || v === null || v === undefined) return NaN;
+        const num = Number(v);
+        return Number.isFinite(num) ? num : NaN;
       })
     );
 
-    // Basic numeric checks
-    const allValues = numericTable.flat();
-
-    if (allValues.some((v) => Number.isNaN(v))) {
+    // Structural checks
+    if (rowCount < 2 || colCount < 2) {
       issues.push({
         type: "error",
-        text: "All counts must be numbers.",
+        text: "Provide at least a 2×2 contingency table.",
       });
     }
 
-    if (allValues.some((v) => v < 0)) {
+    // Value checks
+    const flat = numericTable.flat();
+    if (flat.some((x) => Number.isNaN(x))) {
       issues.push({
         type: "error",
-        text: "Counts must be ≥ 0.",
+        text: "All cells must be numbers.",
+      });
+    }
+    if (flat.some((x) => x < 0)) {
+      issues.push({
+        type: "error",
+        text: "All counts must be ≥ 0.",
       });
     }
 
+    // Totals
     const rowTotals = numericTable.map((row) =>
-      row.reduce((s, v) => s + (isFinite(v) ? v : 0), 0)
+      row.reduce((s, x) => s + (Number.isFinite(x) ? x : 0), 0)
     );
-    const grandTotal = rowTotals.reduce((a, b) => a + b, 0);
+    const grandTotal = rowTotals.reduce((s, t) => s + t, 0);
 
     if (grandTotal <= 0) {
       issues.push({
         type: "error",
-        text: "Grand total must be > 0.",
+        text: "Total count must be > 0.",
       });
     }
 
@@ -164,10 +156,12 @@ const ChiSquareHomogeneity = () => {
       colCount >= 2
     ) {
       const colTotals = Array.from({ length: colCount }, (_, j) =>
-        numericTable.reduce((s, row) => s + (isFinite(row[j]) ? row[j] : 0), 0)
+        numericTable.reduce(
+          (s, row) => s + (Number.isFinite(row[j]) ? row[j] : 0),
+          0
+        )
       );
 
-      // Avoid division by zero
       if (grandTotal > 0) {
         const expectedTable: number[][] = numericTable.map((row, i) =>
           row.map((_, j) => (rowTotals[i] * colTotals[j]) / grandTotal)
@@ -216,6 +210,50 @@ const ChiSquareHomogeneity = () => {
     }
   }, [canCompute, observedTable]);
 
+  // --- Effect sizes (Homogeneity): Cramér’s V + TVD (between-group) ---
+  const effectSizes = useMemo(() => {
+    if (!canCompute || !result) return null;
+
+    const r = observedTable.length; // groups
+    const c = observedTable[0]?.length ?? 0; // categories
+
+    // N = grand total
+    const N = observedTable.reduce(
+      (s, row) =>
+        s + row.reduce((ss, x) => ss + (Number.isFinite(x) ? x : 0), 0),
+      0
+    );
+
+    // Cramér’s V: sqrt( chi2 / ( N * min(r-1, c-1) ) )
+    const denom = N * Math.min(r - 1, c - 1);
+    const cramerV = denom > 0 ? Math.sqrt(result.chi2 / denom) : null;
+    // Total Variation Distance (TVD) between groups
+    const rowTotals = observedTable.map((row) =>
+      row.reduce((s, x) => s + (Number.isFinite(x) ? x : 0), 0)
+    );
+
+    const rowDists = observedTable.map((row, i) => {
+      const tot = rowTotals[i] ?? 0;
+      return row.map((x) => (tot > 0 && Number.isFinite(x) ? x / tot : 0));
+    });
+
+    const tvdBetween = (a: number[], b: number[]) =>
+      0.5 * a.reduce((acc, aj, j) => acc + Math.abs(aj - (b[j] ?? 0)), 0);
+
+    let tvd: number | null = null;
+    if (rowDists.length >= 2) {
+      let max = 0;
+      for (let i = 0; i < rowDists.length; i++) {
+        for (let k = i + 1; k < rowDists.length; k++) {
+          max = Math.max(max, tvdBetween(rowDists[i], rowDists[k]));
+        }
+      }
+      tvd = max;
+    }
+
+    return { cramerV, tvd };
+  }, [canCompute, result, observedTable]);
+
   // --- UI layout ---
   return (
     <div className="space-y-4">
@@ -247,6 +285,7 @@ const ChiSquareHomogeneity = () => {
         alpha={alpha}
         onAlphaChange={setAlpha}
         enabled={canCompute}
+        effectSizes={effectSizes}
       />
     </div>
   );

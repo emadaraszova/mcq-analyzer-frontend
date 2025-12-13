@@ -1,3 +1,4 @@
+import React from "react";
 import { Textarea } from "../ui/textarea";
 import { PromptEditorProps } from "@/types/questionGeneratorPage";
 
@@ -7,38 +8,41 @@ const PromptEditor = ({
   setPrompt,
   setIsCustomPrompt,
 }: PromptEditorProps) => {
-  // --- Handle manual prompt edits ---
   const handlePromptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setPrompt(e.target.value);
-    setIsCustomPrompt(true); // mark as user-modified
+    setIsCustomPrompt(true);
   };
 
-  // --- UI layout ---
   return (
-    <div className="w-full">
-      <div className="mx-auto w-full max-w-3xl">
-        <Textarea
-          id="prompt"
-          value={prompt}
-          onChange={handlePromptChange}
-          placeholder="Generate a case-based MCQ..."
-          className="h-24 w-full resize-none p-4 text-sm sm:text-lg border rounded-lg"
-        />
+    // min-w-0 + max-w-full are key to prevent flex overflow
+    <div className="w-full min-w-0 max-w-full">
+      <Textarea
+        id="prompt"
+        value={prompt}
+        onChange={handlePromptChange}
+        placeholder="Generate a case-based MCQ..."
+        className="
+          w-full min-w-0 max-w-full
+          border rounded-lg p-4
+          text-sm sm:text-lg
+          resize-y overflow-y-auto
+          h-[28vh] min-h-[160px] max-h-[320px]
+          sm:h-[38vh] sm:min-h-[220px] sm:max-h-[420px]
+          md:h-[45vh] md:min-h-[260px] md:max-h-[520px]
+        "
+      />
 
-        {/* Standard helper text */}
-        <small className="block text-sm text-sky-700 mt-1">
-          Edit the prompt manually or let it auto-generate based on your
-          selections.
-        </small>
+      <small className="block text-sm text-sky-700 mt-1 max-w-full">
+        Edit the prompt manually or let it auto-generate based on your
+        selections.
+      </small>
 
-        {/* DISCLAIMER */}
-        <p className="text-xs sm:text-sm text-amber-900 mt-2 max-w-3xl leading-snug">
-          ⚠️ Please double-check your final prompt before generating. If the
-          prompt does not include the required <strong>XXX … XXX </strong>
-          delimiters, the system may fail to produce the requested number of
-          questions, and clinical scenario analysis will not be available.
-        </p>
-      </div>
+      <p className="text-xs sm:text-sm text-amber-900 mt-2 max-w-full leading-snug">
+        ⚠️ Please double-check your final prompt before generating. If the
+        prompt does not include the required <strong>XXX … XXX </strong>
+        delimiters, the system may fail to produce the requested number of
+        questions, and clinical scenario analysis will not be available.
+      </p>
     </div>
   );
 };

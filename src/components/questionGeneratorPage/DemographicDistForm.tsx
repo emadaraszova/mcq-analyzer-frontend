@@ -149,7 +149,7 @@ const DemographicDistributionForm = ({
       </div>
 
       {/* Add row button */}
-      <Button variant="outline" onClick={handleAddRow}>
+      <Button type="button" variant="outline" onClick={handleAddRow}>
         <Plus className="h-4 w-4 mr-2" /> Add row
       </Button>
 

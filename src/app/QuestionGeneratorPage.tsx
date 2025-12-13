@@ -202,17 +202,19 @@ const QuestionGeneratorPage = () => {
           )}
         </div>
 
-        {/* Prompt editor */}
-        <PromptEditor
-          prompt={prompt}
-          setPrompt={(value) => {
-            setPrompt(value);
-            setValue("prompt", value);
-          }}
-          isCustomPrompt={isCustomPrompt}
-          setIsCustomPrompt={setIsCustomPrompt}
-        />
-
+        <div className="flex justify-center">
+          <div className="w-full sm:max-w-xl md:max-w-2xl lg:max-w-3xl">
+            <PromptEditor
+              prompt={prompt}
+              setPrompt={(value) => {
+                setPrompt(value);
+                setValue("prompt", value);
+              }}
+              isCustomPrompt={isCustomPrompt}
+              setIsCustomPrompt={setIsCustomPrompt}
+            />
+          </div>
+        </div>
         {errors.prompt && (
           <p className="text-red-900 text-sm">{errors.prompt.message}</p>
         )}

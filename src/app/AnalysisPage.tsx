@@ -159,7 +159,7 @@ const AnalysisPage = () => {
         {/* Chi-Square calculators */}
         <div className="space-y-4">
           <ChiSquareCalculatorCard
-            title="Chi-Square Goodness-of-Fit"
+            title="Chi-Square Goodness-of-Fit & TVD"
             subtitle="Compare observed counts to expected counts or probabilities."
           >
             <ChiSquareGoF
@@ -169,7 +169,7 @@ const AnalysisPage = () => {
           </ChiSquareCalculatorCard>
 
           <ChiSquareCalculatorCard
-            title="Chi-Square Test of Homogeneity"
+            title="Chi-Square Test of Homogeneity & TVD"
             subtitle="Compare category distributions across two or more groups."
           >
             <ChiSquareHomogeneity />

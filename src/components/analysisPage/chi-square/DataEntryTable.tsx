@@ -4,25 +4,37 @@ import { Plus, Trash } from "lucide-react";
 import Label from "@/components/common/Label";
 import { DataEntryTableProps } from "@/types/analysisPage";
 
-/** --- Data entry table for observed/expected values --- **/
+/** --- Data entry table for observed/expected values (GoF) --- **/
 const DataEntryTable = ({
   rows,
-  entryMode,
   onAddRow,
   onRemoveRow,
   onChangeRow,
 }: DataEntryTableProps) => {
+  /**
+   * Observed counts:
+   * - integers only
+   * - allow empty string while editing
+   */
+  const allowDigitsOnly = (value: string) =>
+    value === "" || /^\d+$/.test(value);
+
+  /**
+   * Expected counts:
+   * - decimals allowed
+   * - allow empty string while editing
+   * - accept dot or comma as decimal separator
+   */
+  const allowDecimal = (value: string) =>
+    value === "" || /^\d*([.,]\d*)?$/.test(value);
+
   return (
     <div className="bg-white border rounded-lg p-4">
       {/* Table header */}
       <div className="grid grid-cols-12 gap-2 font-semibold text-slate-700 mb-2">
         <div className="col-span-5">Category</div>
         <div className="col-span-3">Observed (freq)</div>
-        <div className="col-span-3">
-          {entryMode === "expected-freq"
-            ? "Expected (freq)"
-            : "Expected (prob)"}
-        </div>
+        <div className="col-span-3">Expected (freq)</div>
         <div className="col-span-1 text-right">—</div>
       </div>
 
@@ -37,30 +49,44 @@ const DataEntryTable = ({
             onChange={(e) => onChangeRow(i, { label: e.target.value })}
           />
 
-          {/* Observed frequency */}
+          {/* Observed frequency (integers only) */}
           <Input
             className="col-span-3"
-            inputMode="decimal"
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
             placeholder="0"
-            value={r.observed}
-            onChange={(e) =>
-              onChangeRow(i, {
-                observed: e.target.value === "" ? "" : Number(e.target.value),
-              })
-            }
+            value={String(r.observed ?? "")}
+            onChange={(e) => {
+              const v = e.target.value;
+              if (!allowDigitsOnly(v)) return;
+              onChangeRow(i, { observed: v });
+            }}
+            onPaste={(e) => {
+              const text = e.clipboardData.getData("text");
+              if (text !== "" && !/^\d+$/.test(text)) e.preventDefault();
+            }}
           />
 
-          {/* Expected frequency or probability */}
+          {/* Expected frequency (decimals allowed) */}
           <Input
             className="col-span-3"
+            type="text"
             inputMode="decimal"
-            placeholder={entryMode === "expected-freq" ? "0" : "0–1"}
-            value={r.expected}
-            onChange={(e) =>
-              onChangeRow(i, {
-                expected: e.target.value === "" ? "" : Number(e.target.value),
-              })
-            }
+            pattern="[0-9]*[.,]?[0-9]*"
+            placeholder="0"
+            value={String(r.expected ?? "")}
+            onChange={(e) => {
+              const v = e.target.value;
+              if (!allowDecimal(v)) return;
+              onChangeRow(i, { expected: v });
+            }}
+            onPaste={(e) => {
+              const text = e.clipboardData.getData("text");
+              if (text !== "" && !/^\d*([.,]\d*)?$/.test(text)) {
+                e.preventDefault();
+              }
+            }}
           />
 
           {/* Remove row button */}
@@ -82,10 +108,11 @@ const DataEntryTable = ({
         <div className="text-xs text-slate-500 flex items-center">
           <Label htmlFor="tip" text="Tip:" />
           <span className="ml-1">
-            Expected values must be &gt; 0. In freq mode they must sum to the
-            total observed; in prob mode they must sum to 1.
+            Observed counts must be integers. Expected frequencies may be
+            fractional and should sum to the total observed count.
           </span>
         </div>
+
         <Button variant="outline" onClick={onAddRow}>
           <Plus className="h-4 w-4 mr-2" /> Add row
         </Button>
