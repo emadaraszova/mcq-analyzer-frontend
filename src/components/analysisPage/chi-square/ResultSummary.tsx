@@ -1,51 +1,33 @@
-import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
-import Label from "@/components/common/Label";
 import { ResultSummaryProps } from "@/types/analysisPage";
 
-/** --- Displays chi-square test results and significance decision --- **/
+/** --- Shared summary for chi-square tests (GoF + Homogeneity) --- **/
 const ResultSummary = ({
   result,
   alpha,
   onAlphaChange,
   enabled,
+  effectSizes,
 }: ResultSummaryProps) => {
-  // Local text state so users can clear/type without forcing NaN
-  const [alphaText, setAlphaText] = useState<string>(String(alpha));
-
-  // Keep local text in sync if parent alpha changes elsewhere
-  useEffect(() => {
-    setAlphaText(String(alpha));
-  }, [alpha]);
-
-  const handleAlphaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const v = e.target.value;
-    setAlphaText(v); // always update the textbox
-    const n = Number(v);
-    if (!Number.isNaN(n)) {
-      onAlphaChange(n); // only push up when valid
-    }
-  };
-
-  // Optional: snap back on blur if invalid text remains
-  const handleBlur = () => {
-    const n = Number(alphaText);
-    if (Number.isNaN(n)) setAlphaText(String(alpha));
-  };
-
   return (
     <div className="bg-white border rounded-lg p-4">
-      {/* Alpha input field */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+      {/* Alpha control */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <div className="text-sm font-semibold text-slate-700">
+            Significance (α)
+          </div>
+          <p className="text-xs text-slate-500">
+            Used to decide whether to reject the null hypothesis.
+          </p>
+        </div>
+
         <div className="flex items-center gap-2">
-          <Label htmlFor="alpha" text="Significance (α)" />
           <Input
-            id="alpha"
             className="w-24"
+            value={alpha}
+            onChange={(e) => onAlphaChange(Number(e.target.value))}
             inputMode="decimal"
-            value={alphaText}
-            onChange={handleAlphaChange}
-            onBlur={handleBlur}
             placeholder="0.05"
           />
         </div>
@@ -59,6 +41,7 @@ const ResultSummary = ({
 
       {enabled && result && (
         <div className="mt-4">
+          {/* Main test results */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="bg-blue-50 rounded-md p-3">
               <div className="text-sm text-slate-600">χ² statistic</div>
@@ -78,6 +61,43 @@ const ResultSummary = ({
             </div>
           </div>
 
+          {/* Effect sizes (optional) */}
+          {(effectSizes?.cohensW != null ||
+            effectSizes?.cramerV != null ||
+            effectSizes?.tvd != null) && (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
+              {effectSizes?.cohensW != null && (
+                <div className="bg-slate-50 rounded-md p-3">
+                  <div className="text-sm text-slate-600">Cohen&apos;s w</div>
+                  <div className="text-xl font-semibold">
+                    {effectSizes.cohensW.toFixed(4)}
+                  </div>
+                </div>
+              )}
+
+              {effectSizes?.cramerV != null && (
+                <div className="bg-slate-50 rounded-md p-3">
+                  <div className="text-sm text-slate-600">Cramér&apos;s V</div>
+                  <div className="text-xl font-semibold">
+                    {effectSizes.cramerV.toFixed(4)}
+                  </div>
+                </div>
+              )}
+
+              {effectSizes?.tvd != null && (
+                <div className="bg-slate-50 rounded-md p-3">
+                  <div className="text-sm text-slate-600">
+                    Total Variation Distance (TVD)
+                  </div>
+                  <div className="text-xl font-semibold">
+                    {effectSizes.tvd.toFixed(4)}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Decision */}
           <div className="mt-3 text-xl">
             Decision at α = <b>{alpha}</b>:
             {result.pValue < alpha ? (
