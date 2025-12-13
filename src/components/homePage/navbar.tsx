@@ -7,14 +7,14 @@ const Navbar = () => {
   // --- Utility: determine active link styling ---
   const isActive = (path: string) =>
     pathname === path
-      ? "text-sky-700 font-bold underline underline-offset-4"
+      ? "text-sky-700 underline underline-offset-4"
       : "text-slate-600 hover:text-sky-700";
 
   // --- Layout ---
   return (
-    <nav className="sticky top-0 z-50 w-full bg-blue-50 shadow-md py-4 px-6">
+    <nav className="sticky top-0 z-60 w-full bg-blue-50 shadow-md py-4 px-6">
       <div className="max-w-screen-lg mx-auto flex justify-between items-center">
-        <ul className="flex gap-6 text-lg">
+        <ul className="flex gap-6 font-bold text-lg">
           <li>
             <Link to="/" className={isActive("/")}>
               Home

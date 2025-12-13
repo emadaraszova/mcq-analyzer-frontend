@@ -11,27 +11,26 @@ import { ArrowRight } from "lucide-react";
 import { CardProps } from "@/types/homePage";
 import { useNavigate } from "react-router-dom";
 
-/** --- Displays a feature card with title, description, and navigation button --- **/
 const CardMain = ({ title, description, redirectTo }: CardProps) => {
   const navigate = useNavigate();
 
-  // --- Navigate to target route when button clicked ---
-  const handleNavigation = () => {
-    navigate(redirectTo);
-  };
-
-  // --- Card layout ---
   return (
-    <Card className="w-[80%] hover:border-sky-700">
+    <Card className="w-full max-w-md hover:border-sky-700">
       <CardHeader />
       <CardContent>
         <CardTitle>{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
+        <CardDescription className="line-clamp-2">
+          {description}
+        </CardDescription>
       </CardContent>
       <CardFooter>
-        <Button onClick={handleNavigation} variant="outline">
+        <Button
+          onClick={() => navigate(redirectTo)}
+          variant="outline"
+          className="inline-flex items-center gap-2"
+        >
           <span>Start</span>
-          <ArrowRight />
+          <ArrowRight className="h-4 w-4" />
         </Button>
       </CardFooter>
     </Card>
