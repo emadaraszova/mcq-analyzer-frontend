@@ -26,8 +26,7 @@ const AnalyzerPage = () => {
         },
       });
     },
-    onError: (err: unknown) => {
-      console.error(err);
+    onError: () => {
       toast.error("Failed to start analysis. Please try again.");
     },
   });
@@ -45,23 +44,31 @@ const AnalyzerPage = () => {
     const value = event.target.value;
     setTextareaValue(value);
 
-    // Enable analyze only if XXX ... XXX exists
     const hasDelimiterPair = /XXX\s*[\s\S]+?\s*XXX/.test(value);
     setIsResponseReady(hasDelimiterPair);
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto flex flex-col items-center px-4 py-8">
+    <div className="w-full max-w-3xl mx-auto flex flex-col items-center px-3 sm:px-4 py-8 overflow-x-hidden">
       <Header title="Analyze your text" />
 
-      <div className="w-full">
+      <div className="w-full min-w-0">
         <Label htmlFor="textareaValue" text="Your text" />
         <Textarea
           id="textareaValue"
           placeholder="Paste your text here."
           value={textareaValue}
           onChange={handleTextareaChange}
-          className="mb-4 h-[40vh]"
+          className="
+            mb-4
+            w-full
+            max-w-full
+            min-w-0
+            h-[32vh]
+            sm:h-[40vh]
+            resize-y
+            overflow-x-hidden
+          "
         />
       </div>
 
